@@ -1,4 +1,4 @@
-html {
+﻿html {
   font-size: 14px;
 }
 
@@ -19,4 +19,13 @@ html {
 
 body {
   margin-bottom: 60px;
+}
+footer {
+    background: #9B7EBD;
+    text-align: center;
+}
+
+.logo{
+    height:55px;
+    
 }

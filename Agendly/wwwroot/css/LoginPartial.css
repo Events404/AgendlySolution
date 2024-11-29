@@ -1,0 +1,61 @@
+﻿/* تنسيق القائمة */
+.custom-navbar {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    gap: 10px;
+}
+
+/* عناصر القائمة */
+.custom-nav-item {
+    display: inline-block;
+}
+
+/* روابط القائمة */
+.custom-nav-link {
+    text-decoration: none;
+    color: white;
+    background-color: #3B1E54;
+    padding: 10px 15px;
+    border-radius: 5px;
+    font-size: 16px;
+    font-family: Arial, sans-serif;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    transition: background-color 0.3s ease;
+}
+
+    .custom-nav-link:hover {
+        background-color: #50276D; /* لون أفتح قليلاً عند التمرير */
+    }
+
+/* الزر داخل الفورم */
+.custom-btn-link {
+    background-color: #3B1E54;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    font-family: Arial, sans-serif;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    transition: background-color 0.3s ease;
+}
+
+    
+
+    .custom-btn-link i {
+        margin-right: 5px;
+    }
+
+/* محاذاة العناصر داخل الفورم */
+.custom-form-inline {
+    margin: 0;
+    padding: 0;
+    display: inline-block;
+}

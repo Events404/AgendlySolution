@@ -19,6 +19,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
 using Models;
+using Utility;
 
 namespace Agendly.Areas.Identity.Pages.Account
 {
@@ -59,6 +60,7 @@ namespace Agendly.Areas.Identity.Pages.Account
         /// </summary>
         public string ReturnUrl { get; set; }
 
+
         /// <summary>
         ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
         ///     directly from your code. This API may change or be removed in future releases.
@@ -75,6 +77,24 @@ namespace Agendly.Areas.Identity.Pages.Account
             ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
             ///     directly from your code. This API may change or be removed in future releases.
             /// </summary>
+            [Required(ErrorMessage = "First Name is required.")]
+            [StringLength(16, MinimumLength = 2, ErrorMessage = "First Name must be between 2 and 16 characters.")]
+            [Display(Name = "First Name")]
+
+            public String FirstName { get; set; }
+            [Required(ErrorMessage = "List Name is required.")]
+            [StringLength(16, MinimumLength = 2, ErrorMessage = "List Name must be between 2 and 16 characters.")]
+            [Display(Name = "List Name")]
+            public String LastName { get; set; }
+            [Required(ErrorMessage = "Country is required.")]
+            [StringLength(16, MinimumLength = 2, ErrorMessage = "Country must be between 2 and 16 characters.")]
+            [Display(Name = "Country")]
+            public String Country { get; set; }
+            [Required(ErrorMessage = "City is required.")]
+            [StringLength(16, MinimumLength = 2, ErrorMessage = "City must be between 2 and 16 characters.")]
+            [Display(Name = "City")]
+            public String City { get; set; }
+
             [Required]
             [EmailAddress]
             [Display(Name = "Email")]
@@ -122,6 +142,7 @@ namespace Agendly.Areas.Identity.Pages.Account
                 if (result.Succeeded)
                 {
                     _logger.LogInformation("User created a new account with password.");
+                    await _userManager.AddToRoleAsync(user, SD.UserRoles);
 
                     var userId = await _userManager.GetUserIdAsync(user);
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
@@ -159,7 +180,12 @@ namespace Agendly.Areas.Identity.Pages.Account
         {
             try
             {
-                return Activator.CreateInstance<ApplicationUser>();
+                var user = Activator.CreateInstance<ApplicationUser>();
+                user.FirstName = Input.FirstName;
+                user.LastName = Input.LastName;
+                user.City = Input.City;
+                user.Country = Input.Country;
+                return user;
             }
             catch
             {

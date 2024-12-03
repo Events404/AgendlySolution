@@ -39,10 +39,14 @@ button.accept-policy {
   line-height: inherit;
 }
 
-.footer {
-  position: absolute;
-  bottom: 0;
-  width: 100%;
-  white-space: nowrap;
-  line-height: 60px;
-}
+
+
+
+/*.footer {
+    background-color: #007bff;*/ /* لون خلفية الفوتر */
+    /*color: #fff;*/ /* لون النص */
+    /*text-align: center;*/ /* محاذاة النص في المنتصف */
+    /*line-height: 60px;*/ /* ارتفاع السطر */
+    /*width: 100%;*/ /* عرض كامل الصفحة */
+    /*margin-top: auto;*/ /* دفع الفوتر للنهاية ديناميكيًا */
+/*}*/

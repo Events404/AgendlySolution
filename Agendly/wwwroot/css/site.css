@@ -20,12 +20,8 @@ html {
 body {
   margin-bottom: 60px;
 }
-footer {
-    background: #9B7EBD;
-    text-align: center;
-}
 
-.logo{
-    height:55px;
-    
+.logo {
+    height: 55px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.3);
 }

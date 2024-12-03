@@ -1,4 +1,4 @@
-﻿using Agendly.Data;
+using Agendly.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
@@ -17,15 +17,21 @@ namespace Agendly
             var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(connectionString));
-            builder.Services.AddDatabaseDeveloperPageExceptionFilter();
+
+
+           
 
             //builder.Services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
             //    .AddEntityFrameworkStores<ApplicationDbContext>();
             //builder.Services.AddControllersWithViews();
 
             builder.Services.AddIdentity<ApplicationUser, IdentityRole>(
-              Option => { Option.Password.RequiredLength = 8; Option.Password.RequireDigit = false; }
-              )
+              Option => { 
+                  Option.Password.RequiredLength = 8;
+                  Option.Password.RequireDigit = false;
+                  Option.SignIn.RequireConfirmedAccount = true; 
+              })
+
            .AddEntityFrameworkStores<ApplicationDbContext>()
            .AddDefaultTokenProviders();
 
@@ -37,7 +43,7 @@ namespace Agendly
             // If you use Razor Pages, also add this
             builder.Services.AddRazorPages();
 
-            builder.Services.AddSingleton<IEmailSender, DummyEmailSender>();
+            builder.Services.AddSingleton<IEmailSender, EmailSender>();
 
             var app = builder.Build();
 

@@ -1,0 +1,88 @@
+﻿/* Global Styles */
+body {
+    background-color: #f4f6f9;
+}
+
+/* Sidebar Styling */
+.sidebar {
+    background-color: #1a1a2e;
+    color: #eaeaea;
+    height: 100vh;
+    padding: 20px 10px;
+    width: 280px;
+    display: flex;
+    flex-direction: column;
+}
+
+    .sidebar .logo {
+        max-width: 120px;
+        max-height: 120px;
+        border-radius: 10%;
+        margin: 0 auto 15px auto;
+    }
+
+    .sidebar .logo-text {
+        text-align: center;
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #ffffff;
+        margin-bottom: 20px;
+    }
+
+    .sidebar h4 {
+        text-align: center;
+        font-size: 1.2rem;
+        margin-bottom: 20px;
+        color: #eaeaea;
+    }
+
+    /* Sidebar Links */
+    .sidebar a {
+        color: #eaeaea;
+        text-decoration: none;
+        padding: 14px 20px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        transition: all 0.3s ease-in-out;
+        margin-bottom: 12px;
+        font-size: 1.1rem;
+        background-color: transparent;
+    }
+
+        /* تغيير لون الأيقونات إلى اللون الذهبي */
+        .sidebar a i {
+            margin-right: 20px;
+            font-size: 1.3rem;
+            color: #FFD700;
+        }
+
+        /* تأثيرات التمرير */
+        .sidebar a:hover {
+            background-color: #0f3460;
+            color: #ffffff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        /* عند تحديد الرابط */
+        .sidebar a.active {
+            background-color: #0f3460;
+            color: #ffffff;
+            font-weight: bold;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        /* تحسين التفاعل مع الأيقونات */
+        .sidebar a i {
+            transition: transform 0.2s ease-in-out;
+        }
+
+        .sidebar a:hover i {
+            transform: scale(1.2);
+        }
+
+/* Content Styling */
+.content {
+    padding: 20px;
+    margin-left: 280px;
+}

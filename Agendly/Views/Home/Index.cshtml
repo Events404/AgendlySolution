@@ -2,7 +2,126 @@
     ViewData["Title"] = "Home Page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="container text-center my-5">
+    <!-- Welcome Section -->
+    <section id="welcome" class="mb-5">
+        <h1 class="display-4 fw-bold text-primary">Welcome to AGendly</h1>
+        <p class="lead text-muted">
+            Your ultimate platform for managing events, tasks, and schedules efficiently.
+        </p>
+        <div class="d-flex justify-content-center gap-3 mt-4">
+            <a href="/Events" class="btn btn-primary btn-lg">
+                <i class="fas fa-calendar-alt"></i> View Events
+            </a>
+            <a href="/Account/Login" class="btn btn-outline-primary btn-lg">
+                <i class="fas fa-sign-in-alt"></i> Login
+            </a>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="mb-5">
+        <h2 class="fw-bold text-secondary">About AGendly</h2>
+        <p class="text-muted">
+            AGendly is designed to help you organize your life better. From managing professional events to personal tasks, our platform provides all the tools you need to stay on top of your schedule.
+        </p>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="mb-5">
+        <h2 class="fw-bold text-secondary">Our Features</h2>
+        <div class="row">
+            <div class="col-md-4">
+                <div class="card border-0 shadow">
+                    <div class="card-body">
+                        <i class="fas fa-tasks text-primary fa-2x mb-3"></i>
+                        <h5 class="card-title">Task Management</h5>
+                        <p class="card-text text-muted">
+                            Easily manage and track your tasks with intuitive tools.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card border-0 shadow">
+                    <div class="card-body">
+                        <i class="fas fa-users text-primary fa-2x mb-3"></i>
+                        <h5 class="card-title">Team Collaboration</h5>
+                        <p class="card-text text-muted">
+                            Collaborate with your team and achieve goals together.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card border-0 shadow">
+                    <div class="card-body">
+                        <i class="fas fa-chart-line text-primary fa-2x mb-3"></i>
+                        <h5 class="card-title">Performance Insights</h5>
+                        <p class="card-text text-muted">
+                            Get insights into your productivity with advanced analytics.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Statistics Section -->
+    <section id="stats" class="mb-5">
+        <h2 class="fw-bold text-secondary">Our Achievements</h2>
+        <div class="row text-center">
+            <div class="col-md-3">
+                <h3 class="text-primary">150+</h3>
+                <p class="text-muted">Events Managed</p>
+            </div>
+            <div class="col-md-3">
+                <h3 class="text-primary">2000+</h3>
+                <p class="text-muted">Active Users</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section id="faq" class="mb-5">
+        <h2 class="fw-bold text-secondary">Frequently Asked Questions</h2>
+        <div class="accordion mt-4" id="faqAccordion">
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="faqHeading1">
+                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse1" aria-expanded="true" aria-controls="faqCollapse1">
+                        What is AGendly?
+                    </button>
+                </h2>
+                <div id="faqCollapse1" class="accordion-collapse collapse show" aria-labelledby="faqHeading1" data-bs-parent="#faqAccordion">
+                    <div class="accordion-body text-muted">
+                        AGendly is a platform for managing events, tasks, and schedules to help you stay organized.
+                    </div>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="faqHeading2">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse2" aria-expanded="false" aria-controls="faqCollapse2">
+                        How can I sign up?
+                    </button>
+                </h2>
+                <div id="faqCollapse2" class="accordion-collapse collapse" aria-labelledby="faqHeading2" data-bs-parent="#faqAccordion">
+                    <div class="accordion-body text-muted">
+                        Click on the "Sign Up" button on the homepage and follow the simple steps to create your account.
+                    </div>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="faqHeading3">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse3" aria-expanded="false" aria-controls="faqCollapse3">
+                        Is AGendly free to use?
+                    </button>
+                </h2>
+                <div id="faqCollapse3" class="accordion-collapse collapse" aria-labelledby="faqHeading3" data-bs-parent="#faqAccordion">
+                    <div class="accordion-body text-muted">
+                        Yes, AGendly offers a free plan with basic features. You can upgrade for additional functionalities.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 </div>

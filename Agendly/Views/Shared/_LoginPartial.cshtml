@@ -6,18 +6,40 @@
 <ul class="custom-navbar">
     @if (SignInManager.IsSignedIn(User))
     {
-        <li class="custom-nav-item">
-            <a class="custom-nav-link" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">
-                <i class="fas fa-user-circle"></i> Hello @User.Identity?.Name!
-            </a>
-        </li>
-        <li class="custom-nav-item">
-            <form class="custom-form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
-                <button type="submit" class="custom-btn-link">
-                    <i class="fas fa-sign-out-alt"></i> Logout
-                </button>
+       
+        
+    var user = await UserManager.GetUserAsync(User); // الحصول على كائن المستخدم من UserManager
+    var firstName = user?.FirstName;
+    var lastName = user?.LastName;
+
+
+<li class="nav-item">
+    <a asp-area="Identity" asp-page="/Account/Manage/Index" class="nav-link d-flex align-items-center text-light" title="Manage Profile">
+                @if (UserManager.GetUserAsync(User).Result.ProfilePicture != null)
+                {
+            <li class="nav-item">
+                <img style="width:40px; height:40px;" src="data:image/*;base64,@Convert.ToBase64String(UserManager.GetUserAsync(User).Result.ProfilePicture)" class="rounded-circle" />
+            </li>
+
+                }
+                else
+                {
+            <i class="fas fa-user-circle me-3 fs-4"></i>
+
+                }
+        <span class="text-truncate" style="max-width: calc(100% - 3rem);">
+            <strong>Hello, @firstName @lastName!</strong>
+        </span>
+
+        <li class="nav-item">
+            <form class="form-inline text-truncate" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
+                <button type="submit" class="nav-link btn btn-link text-dark">Logout</button>
             </form>
         </li>
+    </a>
+</li>
+       
+
     }
     else
     {

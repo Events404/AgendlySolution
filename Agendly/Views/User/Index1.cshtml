@@ -1,0 +1,43 @@
+﻿
+@{
+    ViewData["Title"] = "Index1";
+    Layout = "~/Views/_DashboardLayout.cshtml";
+}
+
+<h1>System Overview</h1>
+
+@{
+    ViewBag.Title = "System Overview";
+}
+
+<div class="container mt-5">
+    <section>
+        <div class="row">
+            <!-- Card 1: User Count -->
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="card shadow-lg border-primary">
+                    <div class="card-header bg-primary text-white text-center">
+                        <h5>User Count</h5>
+                    </div>
+                    <div class="card-body text-center">
+                        <h3 class="card-title">@ViewBag.UserCount</h3>
+                        <p class="card-text">The total number of users registered in the system.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 2: Event Count -->
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="card shadow-lg border-success">
+                    <div class="card-header bg-success text-white text-center">
+                        <h5>Event Count</h5>
+                    </div>
+                    <div class="card-body text-center">
+                        <h3 class="card-title">@ViewBag.EventCount</h3>
+                        <p class="card-text">The total number of events organized within the system.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>

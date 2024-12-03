@@ -56,8 +56,27 @@ namespace Agendly.Areas.Identity.Pages.Account.Manage
             ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
             ///     directly from your code. This API may change or be removed in future releases.
             /// </summary>
-            [Phone]
+            [Required(ErrorMessage = "First Name is required.")]
+            [StringLength(16, MinimumLength = 2, ErrorMessage = "First Name must be between 2 and 16 characters.")]
+            [Display(Name = "First Name")]
+
+            public String FirstName { get; set; }
+            [Required(ErrorMessage = "List Name is required.")]
+            [StringLength(16, MinimumLength = 2, ErrorMessage = "List Name must be between 2 and 16 characters.")]
+            [Display(Name = "List Name")]
+            public String LastName { get; set; }
+            [Required(ErrorMessage = "Country is required.")]
+            [StringLength(16, MinimumLength = 2, ErrorMessage = "Country must be between 2 and 16 characters.")]
+            [Display(Name = "Country")]
+            public String Country { get; set; }
+            [Required(ErrorMessage = "City is required.")]
+            [StringLength(16, MinimumLength = 2, ErrorMessage = "City must be between 2 and 16 characters.")]
+            [Display(Name = "City")]
+            public String City { get; set; }
+            public byte[] ProfilePicture { get; set; }
+
             [Display(Name = "Phone number")]
+            [RegularExpression(@"^(010|011|012|015)\d{8}$", ErrorMessage = "The phone number must start with 010, 011, or 012 or 015 and must be 11 digits long.")]
             public string PhoneNumber { get; set; }
         }
 
@@ -70,6 +89,11 @@ namespace Agendly.Areas.Identity.Pages.Account.Manage
 
             Input = new InputModel
             {
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                City = user.City,
+                Country =user.Country,
+                ProfilePicture = user.ProfilePicture,
                 PhoneNumber = phoneNumber
             };
         }
@@ -89,6 +113,64 @@ namespace Agendly.Areas.Identity.Pages.Account.Manage
         public async Task<IActionResult> OnPostAsync()
         {
             var user = await _userManager.GetUserAsync(User);
+            var FirstName = user.FirstName;
+            var LastName = user.LastName;
+            var City = user.City;
+            var Country = user.Country;
+            var ProfilePicture = user.ProfilePicture;
+            if (Request.Form.Files.Count > 0)
+            {
+                var file = Request.Form.Files.FirstOrDefault();
+
+                var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif", ".bmp" };
+                var fileExtension = Path.GetExtension(file.FileName).ToLower();
+
+                if (allowedExtensions.Contains(fileExtension))
+                {
+                    using (var DataStream = new MemoryStream())
+                    {
+                        await file.CopyToAsync(DataStream);
+                        user.ProfilePicture = DataStream.ToArray();
+                        await _userManager.UpdateAsync(user);
+
+                        TempData["StatusMessage"] = "Your profile updated successfully!";
+
+                    }
+                }
+                else
+                {
+
+                    TempData["StatusMessage"] = "The uploaded file is not an image. Please upload a file in (JPG, PNG, GIF, BMP) format.";
+
+                    return RedirectToAction("Index", "Identity", "Account", "Manage");
+
+                }
+
+                return RedirectToAction("Index","Identity", "Account", "Manage");
+
+            }
+
+
+            if (Input.FirstName != FirstName)
+            {
+                user.FirstName = Input.FirstName;
+                await _userManager.UpdateAsync(user);
+            }
+            if (Input.LastName != LastName)
+            {
+                user.LastName = Input.LastName;
+                await _userManager.UpdateAsync(user);
+            }
+            if (Input.City != City)
+            {
+                user.City = Input.City;
+                await _userManager.UpdateAsync(user);
+            }
+            if (Input.Country != Country)
+            {
+                user.Country = Input.Country;
+                await _userManager.UpdateAsync(user);
+            }
             if (user == null)
             {
                 return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");

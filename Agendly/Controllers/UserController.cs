@@ -23,7 +23,6 @@ namespace Agendly.Controllers
 
         public async Task<IActionResult> Index()
         {
-            // أولاً، جلب جميع المستخدمين
             var users = await userManager.Users
                 .Select(user => new ViewModelUser
                 {
@@ -33,13 +32,12 @@ namespace Agendly.Controllers
                     UserName = user.UserName,
                     Email = user.Email,
                     City = user.City,
-                    Country = user.Country,
 
-                    // هنا سنترك الأدوار فارغة مؤقتًا
+                    Country = user.Country,
+                    LockoutEnd = user.LockoutEnd,
                     Roles = new List<string>()
                 }).ToListAsync();
 
-            // الآن، جلب الأدوار لكل مستخدم بشكل منفصل باستخدام await
             foreach (var user in users)
             {
                 user.Roles = await userManager.GetRolesAsync(await userManager.FindByIdAsync(user.Id));
@@ -51,14 +49,72 @@ namespace Agendly.Controllers
 
         public async Task<IActionResult> Index1()
         {
-            var userCount = await userManager.Users.CountAsync(); // عدد المستخدمين
+            var users = await userManager.Users.ToListAsync();
+            var blockedUsersCount = users.Count(user => user.LockoutEnd != null && user.LockoutEnd > DateTime.UtcNow);
+            var activeUsersCount = users.Count(user => user.LockoutEnd == null || user.LockoutEnd <= DateTime.UtcNow);
 
-            // تخزين البيانات في ViewBag
+            ViewBag.BlockedUsersCount = blockedUsersCount;
+            ViewBag.ActiveUsersCount = activeUsersCount;
+
+            var userCount = await userManager.Users.CountAsync(); 
+
             ViewBag.UserCount = userCount;
 
             return View();
         }
+       
 
+
+        //[HttpGet]
+        //public async Task<IActionResult> ManageRole(string userId)
+        //{
+        //    var user = await userManager.FindByIdAsync(userId);
+        //    if (user == null)
+        //        return NotFound();
+        //    var role = await roleManager.Roles.ToListAsync();
+
+        //    var ViewModel = new UserViewModel
+        //    {
+        //        Id = user.Id,
+        //        UserName = user.UserName,
+        //        Roles = role.Select(role => new RoleViewModel
+        //        {
+
+        //            Id = role.Id,
+        //            Name = role.Name,
+        //            NormalizedName = role.NormalizedName,
+        //            IsSelected = userManager.IsInRoleAsync(user, role.Name).Result
+
+
+        //        }).ToList(),
+        //    };
+
+        //    return View(ViewModel);
+        //}
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //public async Task<IActionResult> ManageRole(UserViewModel model)
+        //{
+        //    var user = await userManager.FindByIdAsync(model.Id);
+        //    if (user == null)
+        //        return NotFound();
+        //    var UserRole = await userManager.GetRolesAsync(user);
+        //    foreach (var role in model.Roles)
+        //    {
+        //        if (UserRole.Any(r => r == role.Name && !role.IsSelected))
+        //        {
+        //            await userManager.RemoveFromRoleAsync(user, role.Name);
+        //        }
+
+        //        if (!UserRole.Any(r => r == role.Name && role.IsSelected))
+        //        {
+        //            await userManager.AddToRoleAsync(user, role.Name);
+        //        }
+
+        //    }
+        //    return RedirectToAction(nameof(Index));
+
+        //}
 
         [HttpGet]
         public async Task<IActionResult> ManageRole(string userId)
@@ -66,54 +122,118 @@ namespace Agendly.Controllers
             var user = await userManager.FindByIdAsync(userId);
             if (user == null)
                 return NotFound();
-            var role = await roleManager.Roles.ToListAsync();
 
-            var ViewModel = new UserViewModel
+            var allRoles = await roleManager.Roles.ToListAsync();
+            var userRoles = await userManager.GetRolesAsync(user);
+
+            var viewModel = new UserViewModel
             {
                 Id = user.Id,
                 UserName = user.UserName,
-                Roles = role.Select(role => new RoleViewModel
+                Roles = allRoles.Select(role => new RoleViewModel
                 {
-
                     Id = role.Id,
                     Name = role.Name,
-                    IsSelected = userManager.IsInRoleAsync(user,role.Name).Result
-
-
+                    NormalizedName = role.NormalizedName,
+                    IsSelected = userRoles.Contains(role.Name)
                 }).ToList(),
             };
 
-            return View(ViewModel);
+            return View(viewModel);
         }
+        
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ManageRole(UserViewModel model)
         {
             var user = await userManager.FindByIdAsync(model.Id);
-
             if (user == null)
                 return NotFound();
 
-            var userRoles = await userManager.GetRolesAsync(user);
+            var currentRoles = await userManager.GetRolesAsync(user);
+            var selectedRoles = model.Roles.Where(r => r.IsSelected).Select(r => r.Name).ToList();
 
-            foreach (var role in model.Roles)
+            // الأدوار التي يجب إضافتها وإزالتها
+            var rolesToAdd = selectedRoles.Except(currentRoles).ToList();
+            var rolesToRemove = currentRoles.Except(selectedRoles).ToList();
+
+            // إزالة الأدوار
+            if (rolesToRemove.Any())
             {
-                // التأكد من أن role.Name ليس null أو فارغ
-                if (string.IsNullOrEmpty(role.Name))
+                var removeResult = await userManager.RemoveFromRolesAsync(user, rolesToRemove);
+                if (!removeResult.Succeeded)
                 {
-                    ModelState.AddModelError("", "Role name cannot be null or empty.");
+                    ModelState.AddModelError("", "Failed to remove roles.");
                     return View(model);
                 }
-
-                if (userRoles.Any(e => e == role.Name) && !role.IsSelected)
-                    await userManager.RemoveFromRoleAsync(user, role.Name);
-
-                if (!userRoles.Any(r => r == role.Name) && role.IsSelected)
-                    await userManager.AddToRoleAsync(user, role.Name);
             }
 
-            return RedirectToAction(nameof(Index));
+            // إضافة الأدوار
+            if (rolesToAdd.Any())
+            {
+                var addResult = await userManager.AddToRolesAsync(user, rolesToAdd);
+                if (!addResult.Succeeded)
+                {
+                    ModelState.AddModelError("", "Failed to add roles.");
+                    return View(model);
+                }
+            }
+
+            // إذا كان كل شيء صحيحًا، أعد التوجيه إلى الصفحة الرئيسية أو عرض التأكيد
+            return RedirectToAction("Index");
         }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> BlockUser(string userId)
+        {
+            var user = await userManager.FindByIdAsync(userId);
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            user.LockoutEnd = DateTime.Now.AddDays(30); 
+            var result = await userManager.UpdateAsync(user);
+            if (result.Succeeded)
+            {
+                TempData["Message"] = "User has been blocked.";
+            }
+            else
+            {
+                TempData["Message"] = "Error while blocking user.";
+            }
+
+            return RedirectToAction(nameof(Index)); 
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> UnblockUser(string userId)
+        {
+            var user = await userManager.FindByIdAsync(userId);
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            user.LockoutEnd = null;
+
+            var result = await userManager.UpdateAsync(user);  
+            if (result.Succeeded)
+            {
+                TempData["Message"] = "User has been unblocked.";
+            }
+            else
+            {
+                TempData["Message"] = "Error while unblocking user.";
+            }
+
+            return RedirectToAction(nameof(Index)); 
+        }
+
+
+
 
 
     }

@@ -1,4 +1,6 @@
 using Agendly.Data;
+using DataAccess.Repository.IRepository;
+using DataAccess.Repository;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
@@ -19,21 +21,24 @@ namespace Agendly
                 options.UseSqlServer(connectionString));
 
 
-           
+
 
             //builder.Services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
             //    .AddEntityFrameworkStores<ApplicationDbContext>();
             //builder.Services.AddControllersWithViews();
 
             builder.Services.AddIdentity<ApplicationUser, IdentityRole>(
-              Option => { 
+              Option => {
                   Option.Password.RequiredLength = 8;
                   Option.Password.RequireDigit = false;
-                  Option.SignIn.RequireConfirmedAccount = true; 
+                  Option.SignIn.RequireConfirmedAccount = true;
               })
 
            .AddEntityFrameworkStores<ApplicationDbContext>()
            .AddDefaultTokenProviders();
+            builder.Services.AddScoped<EventIRepository, EventRepository>();
+            builder.Services.AddScoped<CategoryIRepository, CategoryRepository>();
+
 
             builder.Services.AddAuthorization(); // إضافة هذه الخدمة
 

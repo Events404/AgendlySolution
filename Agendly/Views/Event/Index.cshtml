@@ -1,0 +1,25 @@
+﻿@model IEnumerable<Models.Event>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>Event Name</th>
+            <th>Description</th>
+            <th>Added By</th>
+            <th>Creation Date</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.Id</td>
+                <td>@item.Name</td>
+                <td>@item.Description</td>
+                <td>@item.User?.UserName ?? "Unknown"</td>
+                <td>@item.CreationDate.ToString("dd/MM/yyyy")</td>
+            </tr>
+        }
+    </tbody>
+</table>

@@ -1,5 +1,4 @@
-﻿
-@{
+﻿@{
     ViewData["Title"] = "Index1";
     Layout = "~/Views/_DashboardLayout.cshtml";
 }
@@ -26,18 +25,57 @@
                 </div>
             </div>
 
-            <!-- Card 2: Event Count -->
+            <!-- Card 2: Active User Count -->
             <div class="col-md-6 col-lg-4 mb-4">
                 <div class="card shadow-lg border-success">
                     <div class="card-header bg-success text-white text-center">
-                        <h5>Event Count</h5>
+                        <h5>Active Users</h5>
                     </div>
                     <div class="card-body text-center">
-                        <h3 class="card-title">@ViewBag.EventCount</h3>
-                        <p class="card-text">The total number of events organized within the system.</p>
+                        <h3 class="card-title">@ViewBag.ActiveUsersCount</h3>
+                        <p class="card-text">The number of active users currently using the system.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 3: Blocked User Count -->
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="card shadow-lg border-danger">
+                    <div class="card-header bg-danger text-white text-center">
+                        <h5>Blocked Users</h5>
+                    </div>
+                    <div class="card-body text-center">
+                        <h3 class="card-title">@ViewBag.BlockedUsersCount</h3>
+                        <p class="card-text">The number of users who are currently blocked from the system.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="card shadow-lg border-danger">
+                    <div class="card-header bg-danger text-white text-center">
+                        <h5>Blocked Users</h5>
+                    </div>
+                    <div class="card-body text-center">
+                        <h3 class="card-title">@ViewBag.BlockedUsersCount</h3>
+                        <p class="card-text">The number of users who are currently blocked from the system.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="card shadow-lg border-danger">
+                    <div class="card-header bg-danger text-white text-center">
+                        <h5>Blocked Users</h5>
+                    </div>
+                    <div class="card-body text-center">
+                        <h3 class="card-title">@ViewBag.BlockedUsersCount</h3>
+                        <p class="card-text">The number of users who are currently blocked from the system.</p>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 </div>
+
+
+

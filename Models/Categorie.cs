@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -14,7 +15,6 @@ namespace Models
         [StringLength(16, MinimumLength = 2, ErrorMessage = "Name must be between 2 and 16 characters.")]
         [Display(Name = "Name")]
         public string Name { get; set; }
-        public string ImageUrl { get; set; }
         public String EventId { get; set; }
         public List<Event> Events { get; set; }
     }

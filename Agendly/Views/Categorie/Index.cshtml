@@ -1,0 +1,109 @@
+﻿@model IEnumerable<Models.Categorie>
+@{
+    ViewData["Title"] = "Categories";
+    Layout = "~/Views/_DashboardLayout.cshtml";
+}
+                                  
+<div class="container mt-4">
+    <h2>Categories List</h2>
+
+    @if (TempData["success"] != null)
+    {
+        <div class="alert alert-success">
+            @TempData["success"]
+        </div>
+    }
+
+    <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#createModal">Add Category</button>
+
+    <!-- عرض قائمة الفئات -->
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var category in Model)
+            {
+                <tr>
+                    <td>@category.Id</td>
+                    <td>@category.Name</td>
+                    <td>
+                        <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#editModal" data-id="@category.Id" data-name="@category.Name">Edit</button>
+                        <form method="post" action="@Url.Action("Delete", "Categorie")" style="display:inline;">
+                            <input type="hidden" name="CategorieId" value="@category.Id" />
+                            <button type="submit" class="btn btn-danger">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<!-- Modal لإضافة فئة جديدة -->
+<div class="modal fade" id="createModal" tabindex="-1" aria-labelledby="createModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post" action="@Url.Action("Create", "Categorie")">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="createModalLabel">Add New Category</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="Name" class="form-label">Category Name</label>
+                        <input type="text" class="form-control" id="Name" name="Name" required />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Save Category</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal لتعديل الفئة -->
+<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post" action="@Url.Action("Edit", "Categorie")">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editModalLabel">Edit Category</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="EditId" name="Id" />
+                    <div class="mb-3">
+                        <label for="EditName" class="form-label">Category Name</label>
+                        <input type="text" class="form-control" id="EditName" name="Name" required />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Update Category</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // إعداد القيم في المودال تعديل
+        var editModal = document.getElementById('editModal');
+        editModal.addEventListener('show.bs.modal', function (event) {
+            var button = event.relatedTarget;
+            var id = button.getAttribute('data-id');
+            var name = button.getAttribute('data-name');
+            var modal = editModal.querySelector('form');
+            modal.querySelector('#EditId').value = id;
+            modal.querySelector('#EditName').value = name;
+        });
+    </script>
+}

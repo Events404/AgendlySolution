@@ -6,99 +6,50 @@
     Layout = "~/Views/_DashboardLayout.cshtml";
 }
 
-<style>
-    /* Custom Styles */
-    .custom-card-header {
-        background: linear-gradient(45deg, #6c757d, #495057);
-        color: white;
-        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
-    }
+<div class="container mt-5">
+    <!-- Header -->
+    <div class="mb-4 text-center">
+        <h3>@Model.UserName</h3>
+        <p class="text-muted">Manage Role Permissions</p>
+    </div>
 
-    .custom-form-switch {
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
+    <!-- Form -->
+    <form method="post" class="card shadow-sm">
+        <div class="card-body">
+            <!-- Hidden Input for User Id -->
+            <input type="hidden" asp-for="Id" value="@Model.Id" />
 
-        .custom-form-switch:hover {
-            transform: scale(1.05);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
+            <!-- Role Permissions Section -->
+            <fieldset>
+                <legend class="h5 mb-4">Assign Roles</legend>
+                <div>
+                    @for (int i = 0; i < Model.Roles.Count; i++)
+                    {
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" asp-for="Roles[i].IsSelected" value="@Model.Roles[i].Name" id="roleSwitch-@i" />
+                            <label class="form-check-label" for="roleSwitch-@i">
+                                @Model.Roles[i].Name
+                            </label>
+                        </div>
+                    }
+                </div>
 
-    .custom-form-fieldset {
-        border: 1px solid #dee2e6;
-        background-color: #f8f9fa;
-    }
-
-    .custom-form-footer {
-        background: linear-gradient(45deg, #007bff, #0056b3);
-        color: white;
-    }
-
-    .btn-custom-save {
-        background-color: #28a745;
-        color: white;
-        border: none;
-    }
-
-        .btn-custom-save:hover {
-            background-color: #218838;
-        }
-
-    .btn-custom-cancel {
-        background-color: #ffc107;
-        color: black;
-        border: none;
-    }
-
-        .btn-custom-cancel:hover {
-            background-color: #e0a800;
-        }
-</style>
-
-<div class="container my-5">
-    <div class="card shadow-lg border-0">
-        <!-- Header -->
-        <div class="card-header custom-card-header text-center py-4">
-            <h3 class="m-0">@Model.UserName</h3>
-            <p class="small m-0">Manage Role Permissions</p>
+            </fieldset>
         </div>
 
-        <!-- Form -->
-        <form method="post">
-            <!-- Card Body -->
-            <div class="card-body bg-light p-4">
-                <input type="hidden" asp-for="Id" />
+        <!-- Validation Summary -->
+        <div class="card-body">
+            <div asp-validation-summary="All" class="text-danger"></div>
+        </div>
 
-                <!-- Role Permissions Section -->
-                <fieldset class="custom-form-fieldset rounded-3 shadow-sm p-4">
-                    <legend class="text-primary fw-bold fs-5 px-3">Assign Roles</legend>
-                    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mt-3">
-                        @for (int i = 0; i < Model.Roles.Count; i++)
-                        {
-                            <div class="col">
-                                <div class="form-check form-switch bg-white shadow-sm rounded-3 p-3 d-flex align-items-center custom-form-switch">
-                                    <input class="form-check-input me-3" type="checkbox" asp-for="Roles[i].IsSelected" id="roleSwitch-@i" />
-                                    <label class="form-check-label text-secondary fw-semibold" for="roleSwitch-@i">
-                                        @Model.Roles[i].Name
-                                    </label>
-                                </div>
-                            </div>
-                        }
-                    </div>
-                </fieldset>
-            </div>
-
-            <!-- Validation Summary -->
-            <div asp-validation-summary="All" class="alert alert-danger mx-4 mt-3"></div>
-
-            <!-- Card Footer -->
-            <div class="card-footer custom-form-footer text-center py-3">
-                <button type="submit" class="btn btn-custom-save me-3">
-                    <i class="fas fa-save"></i> Save Changes
-                </button>
-                <a asp-action="Index" class="btn btn-custom-cancel">
-                    <i class="fas fa-arrow-left"></i> Back
-                </a>
-            </div>
-        </form>
-    </div>
+        <!-- Card Footer -->
+        <div class="card-footer d-flex justify-content-between">
+            <button type="submit" class="btn btn-primary">
+                Save Changes
+            </button>
+            <a asp-action="Index" class="btn btn-secondary">
+                Back
+            </a>
+        </div>
+    </form>
 </div>

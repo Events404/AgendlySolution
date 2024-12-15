@@ -12,7 +12,7 @@ namespace Models
         public int WishListId { get; set; }
         public WishList wishList { get; set; }
         
-        public string EventId { get; set; }
+        public int EventId { get; set; }
         public Event Event { get; set; }
     }
 }

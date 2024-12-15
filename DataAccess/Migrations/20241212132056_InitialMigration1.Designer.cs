@@ -9,11 +9,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace Agendly.Data.Migrations
+namespace DataAccess.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20241207165751_category")]
-    partial class category
+    [Migration("20241212132056_InitialMigration1")]
+    partial class InitialMigration1
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -257,9 +257,8 @@ namespace Agendly.Data.Migrations
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("EventId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("EventId")
+                        .HasColumnType("int");
 
                     b.Property<string>("Status")
                         .IsRequired()
@@ -283,10 +282,6 @@ namespace Agendly.Data.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("EventId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -317,16 +312,13 @@ namespace Agendly.Data.Migrations
                     b.Property<int>("EventId")
                         .HasColumnType("int");
 
-                    b.Property<string>("EventId1")
-                        .HasColumnType("nvarchar(450)");
-
                     b.Property<string>("UserId")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("EventId1");
+                    b.HasIndex("EventId");
 
                     b.HasIndex("UserId");
 
@@ -335,8 +327,11 @@ namespace Agendly.Data.Migrations
 
             modelBuilder.Entity("Models.Event", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<int>("CategorieId")
                         .HasColumnType("int");
@@ -359,10 +354,7 @@ namespace Agendly.Data.Migrations
                         .HasMaxLength(1000)
                         .HasColumnType("nvarchar(1000)");
 
-                    b.Property<int?>("DisLike")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Distric")
+                    b.Property<string>("District")
                         .IsRequired()
                         .HasMaxLength(16)
                         .HasColumnType("nvarchar(16)");
@@ -370,8 +362,9 @@ namespace Agendly.Data.Migrations
                     b.Property<DateTime>("EndDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("Like")
-                        .HasColumnType("int");
+                    b.Property<string>("Location")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -380,9 +373,6 @@ namespace Agendly.Data.Migrations
 
                     b.Property<decimal?>("Price")
                         .HasColumnType("decimal(18,2)");
-
-                    b.Property<double?>("Rate")
-                        .HasColumnType("float");
 
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("datetime2");
@@ -399,10 +389,6 @@ namespace Agendly.Data.Migrations
                     b.Property<string>("UserId")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("location")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -441,10 +427,6 @@ namespace Agendly.Data.Migrations
                     b.Property<int>("EventId")
                         .HasColumnType("int");
 
-                    b.Property<string>("EventId1")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
@@ -459,7 +441,7 @@ namespace Agendly.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("EventId1");
+                    b.HasIndex("EventId");
 
                     b.ToTable("PromoCodes");
                 });
@@ -475,9 +457,8 @@ namespace Agendly.Data.Migrations
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("EventId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("EventId")
+                        .HasColumnType("int");
 
                     b.Property<string>("UserId")
                         .IsRequired()
@@ -517,9 +498,8 @@ namespace Agendly.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("EventId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int>("EventId")
+                        .HasColumnType("int");
 
                     b.Property<int>("WishListId")
                         .HasColumnType("int");
@@ -598,8 +578,10 @@ namespace Agendly.Data.Migrations
             modelBuilder.Entity("Models.Comment", b =>
                 {
                     b.HasOne("Models.Event", "Event")
-                        .WithMany("comments")
-                        .HasForeignKey("EventId1");
+                        .WithMany("Comments")
+                        .HasForeignKey("EventId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("Models.ApplicationUser", "User")
                         .WithMany()
@@ -614,7 +596,7 @@ namespace Agendly.Data.Migrations
 
             modelBuilder.Entity("Models.Event", b =>
                 {
-                    b.HasOne("Models.Categorie", "categorie")
+                    b.HasOne("Models.Categorie", "Categorie")
                         .WithMany("Events")
                         .HasForeignKey("CategorieId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -626,16 +608,16 @@ namespace Agendly.Data.Migrations
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.Navigation("User");
+                    b.Navigation("Categorie");
 
-                    b.Navigation("categorie");
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Models.PromoCode", b =>
                 {
                     b.HasOne("Models.Event", "Event")
                         .WithMany("PromoCodes")
-                        .HasForeignKey("EventId1")
+                        .HasForeignKey("EventId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -699,9 +681,9 @@ namespace Agendly.Data.Migrations
 
             modelBuilder.Entity("Models.Event", b =>
                 {
-                    b.Navigation("PromoCodes");
+                    b.Navigation("Comments");
 
-                    b.Navigation("comments");
+                    b.Navigation("PromoCodes");
                 });
 #pragma warning restore 612, 618
         }

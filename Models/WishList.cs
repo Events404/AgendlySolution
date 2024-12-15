@@ -12,5 +12,7 @@ namespace Models
         public string UserId { get; set; }
 
         public ApplicationUser User { get; set; }
+        public ICollection<WishListEvent> WishListEvents { get; set; }
+
     }
 }

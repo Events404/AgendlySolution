@@ -1,25 +1,70 @@
-﻿@model IEnumerable<Models.Event>
+﻿@model Utility.ViewModel.EventIndexViewModel
 
-<table class="table table-striped">
-    <thead>
-        <tr>
-            <th>#</th>
-            <th>Event Name</th>
-            <th>Description</th>
-            <th>Added By</th>
-            <th>Creation Date</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
+@{
+    ViewData["Title"] = "Events";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container mt-4">
+    <h1>@ViewData["Title"]</h1>
+
+    <!-- شريط البحث -->
+    <form method="get" action="@Url.Action("Index", "Event")" class="d-flex justify-content-center mb-4">
+        <input type="text" name="searchQuery" value="@Model.SearchQuery" class="form-control w-50" placeholder="Search events..." />
+        <button type="submit" class="btn btn-primary ms-2">Search</button>
+    </form>
+
+    <!-- الفلاتر -->
+    <div class="text-center mb-4">
+        <a href="@Url.Action("Index", "Event", new { filter = "all" })" class="btn btn-secondary mx-2">All</a>
+        <a href="@Url.Action("Index", "Event", new { filter = "available" })" class="btn btn-success mx-2">Available</a>
+        <a href="@Url.Action("Index", "Event", new { filter = "past" })" class="btn btn-danger mx-2">Past</a>
+        <a href="@Url.Action("Index", "Event", new { filter = "today" })" class="btn btn-info mx-2">Today</a>
+    </div>
+
+    <!-- عرض الأحداث -->
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+        @foreach (var eventItem in Model.Events)
         {
-            <tr>
-                <td>@item.Id</td>
-                <td>@item.Name</td>
-                <td>@item.Description</td>
-                <td>@item.User?.UserName ?? "Unknown"</td>
-                <td>@item.CreationDate.ToString("dd/MM/yyyy")</td>
-            </tr>
+            <div class="col">
+                <div class="card h-100">
+                    <!-- صورة الحدث -->
+                    <img src="~/imgEvent/@eventItem.UrlImg" class="card-img-top" alt="Event image" style="height: 200px; object-fit: cover;">
+                    <div class="card-body">
+                        <h5 class="card-title">@eventItem.Name</h5>
+                        <p class="card-text">@eventItem.Description</p>
+                    </div>
+                    <div class="card-footer d-flex justify-content-between">
+                        <small class="text-muted">@eventItem.StartDateHumanized</small>
+                        <small class="text-muted">@eventItem.User.FirstName</small>
+                    </div>
+                    <!-- زر التفاصيل -->
+                    <div class="card-footer text-center">
+                        <a href="@Url.Action("Details", "Event", new { id = eventItem.Id })" class="btn btn-primary">View Details</a>
+                    </div>
+                    <!-- عرض تاريخ الانتهاء باللون الأحمر -->
+                    <div class="card-footer text-center">
+                        <span class="text-danger">End Date: @eventItem.EndDate.ToString("g")</span>
+                    </div>
+                </div>
+            </div>
         }
-    </tbody>
-</table>
+    </div>
+
+    <!-- التصفح بين الصفحات -->
+    <div class="d-flex justify-content-center mt-4">
+        @if (Model.CurrentPage > 1)
+        {
+            <a href="@Url.Action("Index", "Event", new { page = Model.CurrentPage - 1, filter = Model.Filter, searchQuery = Model.SearchQuery })" class="btn btn-outline-secondary me-2">Previous</a>
+        }
+
+        <span class="d-flex align-items-center">
+            Page @Model.CurrentPage of @Model.TotalPages
+        </span>
+
+        @if (Model.CurrentPage < Model.TotalPages)
+        {
+            <a href="@Url.Action("Index", "Event", new { page = Model.CurrentPage + 1, filter = Model.Filter, searchQuery = Model.SearchQuery })" class="btn btn-outline-secondary ms-2">Next</a>
+        }
+    </div>
+</div>

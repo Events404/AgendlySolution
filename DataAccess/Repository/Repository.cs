@@ -40,12 +40,10 @@ namespace DataAccess.Repository
             }
 
             if (includeProp != null)
-
             {
                 foreach (var prop in includeProp)
                 {
                     query = query.Include(prop);
-
                 }
             }
 
@@ -55,6 +53,26 @@ namespace DataAccess.Repository
         public T? GetOne(Expression<Func<T, bool>> expression)
         {
             return dbSet.Where(expression).FirstOrDefault();
+        }
+
+        public T? GetFirstOrDefault(Expression<Func<T, bool>> expression, Expression<Func<T, object>>[]? includeProp = null)
+        {
+            IQueryable<T> query = dbSet;
+
+            if (expression != null)
+            {
+                query = query.Where(expression);
+            }
+
+            if (includeProp != null)
+            {
+                foreach (var prop in includeProp)
+                {
+                    query = query.Include(prop);
+                }
+            }
+
+            return query.FirstOrDefault();
         }
 
 
@@ -81,6 +99,14 @@ namespace DataAccess.Repository
         {
             dbContext.SaveChanges();
 
+        }
+        public int Count(Expression<Func<T, bool>>? expression = null)
+        {
+            if (expression != null)
+            {
+                return dbSet.Count(expression);
+            }
+            return dbSet.Count();
         }
     }
 }

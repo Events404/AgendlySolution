@@ -13,9 +13,8 @@ namespace Models
         public int Id { get; set; }
         [Required(ErrorMessage = "Name is required.")]
         [StringLength(16, MinimumLength = 2, ErrorMessage = "Name must be between 2 and 16 characters.")]
-        [Display(Name = "Name")]
         public string Name { get; set; }
-        public String EventId { get; set; }
+        [ValidateNever]
         public List<Event> Events { get; set; }
     }
 }

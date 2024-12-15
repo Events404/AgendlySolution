@@ -1,0 +1,331 @@
+﻿@model Models.Event
+
+@{
+    ViewData["Title"] = "Event Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container py-5">
+    <!-- Countdown Section -->
+    <div class="row mb-5">
+        <div class="col text-center">
+            <div class="card shadow border-0 p-4">
+                <h2 class="display-4 text-primary fw-bold">
+                    <i class="fas fa-clock"></i> Event Countdown
+                </h2>
+                <p id="countdown" class="fs-3 text-secondary fw-bold"></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Event Details -->
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card shadow border-0 mb-4">
+                <img src="~/imgEvent/@Model.UrlImg" class="card-img-top rounded-top" alt="Event Image">
+                <div class="card-body">
+                    <h3 class="card-title text-primary fw-bold">
+                        <i class="fas fa-calendar-alt"></i> @Model.Name
+                    </h3>
+                    <p class="text-muted">@Model.Description</p>
+
+                    <h5 class="mt-4 text-secondary">
+                        <i class="fas fa-map-marker-alt text-danger"></i> Location
+                    </h5>
+                    <p class="text-muted">
+                        @Model.Street, @Model.District, @Model.City, @Model.Country
+                        <a href="@Model.Location">
+                            <i class="fas fa-map-marked-alt"></i> View on Map
+                        </a>
+                    </p>
+
+                    <p><strong>Start Date:</strong> @Model.StartDate.ToString("dd MMM yyyy HH:mm")</p>
+                    <p><strong>End Date:</strong> @Model.EndDate.ToString("dd MMM yyyy HH:mm")</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- User Information -->
+        <div class="col-lg-4">
+            <div class="card shadow border-0 mb-4">
+                <div class="card-body">
+                    <h5 class="text-primary">
+                        <i class="fas fa-user"></i> Event Added By
+                    </h5>
+                    <p><strong>Name:</strong> @Model.User.FirstName @Model.User.LastName</p>
+                    <p><strong>Email:</strong> @Model.User.Email</p>
+
+                    <a href="mailto:@Model.User.Email" class="btn btn-outline-primary w-100 mt-3">
+                        <i class="fas fa-envelope"></i> Contact
+                    </a>
+                </div>
+            </div>
+            <div class="row mb-4">
+                <div class="col text-center">
+                    <div class="d-flex justify-content-center align-items-center gap-3">
+                        <!-- Like Button -->
+                        <button id="likeBtn" class="btn btn-outline-success" data-state="inactive">
+                            <i class="fas fa-thumbs-up"></i> Like
+                            <span id="likeCount">@ViewBag.LikeCount</span>
+                        </button>
+                        <!-- Dislike Button -->
+                        <button id="dislikeBtn" class="btn btn-outline-danger" data-state="inactive">
+                            <i class="fas fa-thumbs-down"></i> Dislike
+                            <span id="dislikeCount">@ViewBag.DislikeCount</span>
+                        </button>
+                    </div>
+                    <p class="mt-2 text-muted" id="likeDislikeMessage"></p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Category Section -->
+    <div class="row mb-4">
+        <div class="col">
+            <div class="card shadow border-0 rounded-3 p-3">
+                <div class="d-flex align-items-center">
+                    <div class="me-3">
+                        <i class="fas fa-tags fa-2x text-info"></i>
+                    </div>
+                    <div>
+                        <h5 class="text-info fw-bold mb-1">Category</h5>
+                        <p class="text-dark fw-bold mb-0">@Model.Categorie.Name</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Availability Section -->
+    <div class="row mb-4">
+        <div class="col">
+            <div class="d-flex justify-content-between align-items-center">
+                <h5 class="text-secondary">
+                    <i class="fas fa-check-circle"></i> Availability
+                </h5>
+                <p id="availability-status" class="mb-0">
+                    @if (Model.Available)
+                    {
+                        <span class="badge bg-success">Available</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-danger">Not Available</span>
+                    }
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Available Seats Section without Progress Bar -->
+    <div class="row mb-4">
+        <div class="col">
+            <div class="card shadow border-0 p-4">
+                <h5 class="text-secondary">
+                    <i class="fas fa-chair"></i> Available Seats:
+                    <span id="seats-available" class="text-dark fw-bold">@Model.Seats</span>
+                </h5>
+                <label for="numberOfSeats" class="form-label mt-3">Enter number of seats to reserve:</label>
+                <input type="number" id="numberOfSeats" class="form-control" min="1" max="@Model.Seats" />
+
+                <button id="reserveBtn" class="btn btn-primary w-100 mt-3" disabled>Reserve Now</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Comments Section -->
+    <div class="row mb-5">
+        <div class="col">
+            <div class="card shadow border-0 p-4">
+                <h5 class="text-primary fw-bold">
+                    <i class="fas fa-comments"></i> Comments
+                </h5>
+
+                <!-- New Comment Form -->
+                <form id="commentForm" class="mb-3">
+                    <div id="alertContainer"></div>
+                    <div class="mb-3">
+                        <textarea class="form-control" id="commentText" rows="3" placeholder="Leave a comment..." required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Post Comment</button>
+                </form>
+                <small>
+                    <h5 class="text-primary fw-bold">
+                        <i class="fas fa-comments"></i> Comments (@ViewBag.CommentsCount)
+                    </h5>
+                </small>
+
+                <!-- Comments List -->
+                <div id="commentsList">
+                    @foreach (var comment in Model.Comments)
+                    {
+                        <div class="mb-3 border-bottom pb-2">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h6 class="text-primary">@comment.User.FirstName  @comment.User.LastName</h6>
+                                <span class="text-muted">@comment.CreationDate.ToString("dd MMM yyyy HH:mm")</span>
+                            </div>
+                            <p>@comment.Content</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @section Scripts {
+        <script>
+            // Event Countdown Timer
+            var eventDate = new Date('@Model.StartDate.ToString("yyyy-MM-ddTHH:mm:ss")').getTime();
+
+            var countdownFunction = setInterval(function () {
+                var now = new Date().getTime();
+                var distance = eventDate - now;
+
+                var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                document.getElementById("countdown").innerHTML = `${days}d ${hours}h ${minutes}m ${seconds}s`;
+
+                if (distance < 0) {
+                    clearInterval(countdownFunction);
+                    document.getElementById("countdown").innerHTML = "Event Started!";
+                    document.getElementById("reserveBtn").disabled = true;
+                }
+            }, 1000);
+
+            // Enable Reserve Button
+            document.getElementById('numberOfSeats').addEventListener('input', function () {
+                var numberOfSeats = document.getElementById('numberOfSeats').value;
+                var availableSeats = parseInt(document.getElementById('seats-available').textContent);
+
+                document.getElementById('reserveBtn').disabled = !(numberOfSeats > 0 && numberOfSeats <= availableSeats);
+            });
+            // Reserve Seats
+            document.getElementById('reserveBtn').addEventListener('click', function () {
+                var numberOfSeats = document.getElementById('numberOfSeats').value;
+
+                $.ajax({
+                    type: 'POST',
+                    url: '@Url.Action("ReserveSeats", "Event")',
+                    data: {
+                        id: @Model.Id,
+                        numberOfSeats: numberOfSeats
+                    },
+                    success: function (response) {
+                        if (response.success) {
+                            alert(response.message);
+
+                            // Update seats available from server response
+                            document.getElementById('seats-available').textContent = response.updatedSeats;
+                        } else {
+                            alert(response.message);
+                        }
+                    },
+                    error: function () {
+                        alert('An error occurred. Please try again.');
+                    }
+                });
+            });
+
+
+            // Submit Comment
+            document.getElementById('commentForm').addEventListener('submit', function (e) {
+                e.preventDefault();
+                var commentText = document.getElementById('commentText').value;
+
+                // Call API to post comment
+                $.ajax({
+                    type: 'POST',
+                    url: '@Url.Action("AddComment", "Event")',
+                    data: {
+                        eventId: @Model.Id,
+                        commentContent: commentText
+                    },
+                    success: function (response) {
+                        if (response.success) {
+                            var newComment = `
+                                            <div class="mb-3 border-bottom pb-2">
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <h6 class="text-primary">${response.userName}</h6>
+                                                    <span class="text-muted">${response.postedDate}</span>
+                                                </div>
+                                                <p>${response.commentText}</p>
+                                            </div>
+                                        `;
+                            document.getElementById('commentsList').innerHTML += newComment;
+                            document.getElementById('commentText').value = ''; // Clear the comment box
+                        } else {
+                            alert(response.message);
+                        }
+                    },
+                    error: function () {
+                        alert('Error posting the comment. Please try again.');
+                    }
+                });
+            });
+           document.getElementById('likeBtn').addEventListener('click', function () {
+    handleLikeDislike(true);
+});
+
+document.getElementById('dislikeBtn').addEventListener('click', function () {
+    handleLikeDislike(false);
+});
+
+function handleLikeDislike(isLike) {
+    $.ajax({
+        type: 'POST',
+        url: '@Url.Action("AddLikeDislike", "Event")',
+        data: {
+            eventId: @Model.Id,
+            isLike: isLike
+        },
+        success: function (response) {
+            const messageElement = document.getElementById('likeDislikeMessage');
+            const likeBtn = document.getElementById('likeBtn');
+            const dislikeBtn = document.getElementById('dislikeBtn');
+            const likeCount = document.getElementById('likeCount');
+            const dislikeCount = document.getElementById('dislikeCount');
+
+            if (response.success) {
+                messageElement.textContent = response.message;
+                messageElement.classList.remove('text-danger');
+                messageElement.classList.add('text-success');
+
+                // Update counts
+                likeCount.textContent = response.likeCount;
+                dislikeCount.textContent = response.dislikeCount;
+
+                // Toggle button state
+                if (isLike) {
+                    likeBtn.classList.add('btn-success');
+                    likeBtn.classList.remove('btn-outline-success');
+                    dislikeBtn.classList.add('btn-outline-danger');
+                    dislikeBtn.classList.remove('btn-danger');
+                } else {
+                    dislikeBtn.classList.add('btn-danger');
+                    dislikeBtn.classList.remove('btn-outline-danger');
+                    likeBtn.classList.add('btn-outline-success');
+                    likeBtn.classList.remove('btn-success');
+                }
+            } else {
+                messageElement.textContent = response.message;
+                messageElement.classList.remove('text-success');
+                messageElement.classList.add('text-danger');
+            }
+        },
+        error: function () {
+            const messageElement = document.getElementById('likeDislikeMessage');
+            messageElement.textContent = 'An error occurred. Please try again.';
+            messageElement.classList.remove('text-success');
+            messageElement.classList.add('text-danger');
+        }
+    });
+}
+
+        </script>
+    }
+</div>

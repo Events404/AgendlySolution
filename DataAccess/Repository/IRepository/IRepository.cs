@@ -17,7 +17,7 @@ namespace DataAccess.Repository.IRepository
         T? GetOne(Expression<Func<T, bool>> expression);
 
         T? GetById(int entityId);
-
+        T? GetFirstOrDefault(Expression<Func<T, bool>> expression, Expression<Func<T, object>>[]? includeProp = null);
 
         void create(T entity);
 
@@ -31,5 +31,7 @@ namespace DataAccess.Repository.IRepository
 
 
         void commit();
+        int Count(Expression<Func<T, bool>>? expression = null);
+
     }
 }

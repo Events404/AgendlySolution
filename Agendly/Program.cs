@@ -38,7 +38,9 @@ namespace Agendly
            .AddDefaultTokenProviders();
             builder.Services.AddScoped<EventIRepository, EventRepository>();
             builder.Services.AddScoped<CategoryIRepository, CategoryRepository>();
-
+            builder.Services.AddScoped<CommentIRepository, CommentRepository>();
+            builder.Services.AddScoped<LikeDisLikeIRepository, LikeDisLikeRepository>();
+            builder.Services.AddScoped<NotificationIRepository, NotificationRepository>();
 
             builder.Services.AddAuthorization(); // إضافة هذه الخدمة
 

@@ -3,54 +3,53 @@
 @inject UserManager<ApplicationUser> UserManager
 <link href="~/css/LoginPartial.css" rel="stylesheet" />
 
-<ul class="custom-navbar">
+<ul class="navbar-nav d-flex align-items-center">
     @if (SignInManager.IsSignedIn(User))
     {
-       
-        
-    var user = await UserManager.GetUserAsync(User); // الحصول على كائن المستخدم من UserManager
-    var firstName = user?.FirstName;
-    var lastName = user?.LastName;
+        var user = await UserManager.GetUserAsync(User);
+        var firstName = user?.FirstName;
+        var lastName = user?.LastName;
 
+        <li class="nav-item">
+            <a href="/Event/Create" class="btn btn-link text-light text-decoration-none">
+                <i class="fas fa-calendar-plus me-2"></i> Create Event
+            </a>
+        </li>
 
-<li class="nav-item">
-    <a asp-area="Identity" asp-page="/Account/Manage/Index" class="nav-link d-flex align-items-center text-light" title="Manage Profile">
+        <li class="nav-item d-flex align-items-center">
+            <a asp-area="Identity" asp-page="/Account/Manage/Index" class="nav-link text-light d-flex align-items-center text-decoration-none" title="Manage Profile">
                 @if (UserManager.GetUserAsync(User).Result.ProfilePicture != null)
                 {
-            <li class="nav-item">
-                <img style="width:40px; height:40px;" src="data:image/*;base64,@Convert.ToBase64String(UserManager.GetUserAsync(User).Result.ProfilePicture)" class="rounded-circle" />
-            </li>
-
+                    <img style="width:40px; height:40px;" src="data:image/*;base64,@Convert.ToBase64String(UserManager.GetUserAsync(User).Result.ProfilePicture)" class="rounded-circle" />
                 }
                 else
                 {
-            <i class="fas fa-user-circle me-3 fs-4"></i>
-
+                    <i class="fas fa-user-circle me-3 fs-4"></i>
                 }
-        <span class="text-truncate" style="max-width: calc(100% - 3rem);">
-            <strong>Hello, @firstName @lastName!</strong>
-        </span>
+                <span class="text-truncate" style="max-width: calc(100% - 3rem);">
+                    <strong>Hello, @firstName @lastName!</strong>
+                </span>
+            </a>
+        </li>
 
         <li class="nav-item">
-            <form class="form-inline text-truncate" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
-                <button type="submit" class="nav-link btn btn-link text-dark">Logout</button>
+            <form class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
+                <button type="submit" class="btn btn-link text-light text-decoration-none">
+                    <i class="fas fa-sign-out-alt me-2"></i> Logout
+                </button>
             </form>
         </li>
-    </a>
-</li>
-       
-
     }
     else
     {
-        <li class="custom-nav-item">
-            <a class="custom-nav-link" asp-area="Identity" asp-page="/Account/Register">
-                <i class="fas fa-user-plus"></i> Register
+        <li class="nav-item">
+            <a class="nav-link text-dark text-decoration-none" asp-area="Identity" asp-page="/Account/Register">
+                <i class="fas fa-user-plus me-2"></i> Register
             </a>
         </li>
-        <li class="custom-nav-item">
-            <a class="custom-nav-link" asp-area="Identity" asp-page="/Account/Login">
-                <i class="fas fa-sign-in-alt"></i> Login
+        <li class="nav-item">
+            <a class="nav-link text-dark text-decoration-none" asp-area="Identity" asp-page="/Account/Login">
+                <i class="fas fa-sign-in-alt me-2"></i> Login
             </a>
         </li>
     }

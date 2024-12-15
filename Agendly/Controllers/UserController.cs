@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using DataAccess.Repository.IRepository;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Models;
 using Utility;
 using Utility.ViewModel;
@@ -14,11 +16,13 @@ namespace Agendly.Controllers
     {
         private readonly UserManager<ApplicationUser> userManager;
         private readonly RoleManager<IdentityRole> roleManager;
+        private readonly EventIRepository eventIRepository;
 
-        public UserController(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
+        public UserController(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager , EventIRepository eventIRepository)
         {
             this.userManager = userManager;
             this.roleManager = roleManager;
+            this.eventIRepository = eventIRepository;
         }
 
         public async Task<IActionResult> Index()
@@ -46,23 +50,31 @@ namespace Agendly.Controllers
             return View(users);
         }
 
-
-        public async Task<IActionResult> Index1()
+        
+        public IActionResult Index1()
         {
-            var users = await userManager.Users.ToListAsync();
-            var blockedUsersCount = users.Count(user => user.LockoutEnd != null && user.LockoutEnd > DateTime.UtcNow);
-            var activeUsersCount = users.Count(user => user.LockoutEnd == null || user.LockoutEnd <= DateTime.UtcNow);
+            var blockedUsersCount = userManager.Users.Count(user => user.LockoutEnd != null && user.LockoutEnd > DateTime.UtcNow);
+            var activeUsersCount = userManager.Users.Count(user => user.LockoutEnd == null || user.LockoutEnd <= DateTime.UtcNow);
+            var userCount = userManager.Users.Count();
+
+            var eventCount = eventIRepository.Count();
+            var availableEventsCount = eventIRepository.Count(e => e.StartDate > DateTime.Now && e.EndDate > DateTime.Now);
+            var pastEventsCount = eventIRepository.Count(e => e.EndDate < DateTime.Now);
+            var todayEventsCount = eventIRepository.Count(e => e.StartDate.Date == DateTime.Now.Date);
 
             ViewBag.BlockedUsersCount = blockedUsersCount;
             ViewBag.ActiveUsersCount = activeUsersCount;
-
-            var userCount = await userManager.Users.CountAsync(); 
-
             ViewBag.UserCount = userCount;
+
+            ViewBag.EventCount = eventCount;
+            ViewBag.AvailableEventsCount = availableEventsCount;
+            ViewBag.PastEventsCount = pastEventsCount;
+            ViewBag.TodayEventsCount = todayEventsCount;
 
             return View();
         }
-       
+
+
 
 
         //[HttpGet]

@@ -51,31 +51,57 @@
                 </div>
             </div>
 
+            <!-- Card 4: Total Events -->
             <div class="col-md-6 col-lg-4 mb-4">
-                <div class="card shadow-lg border-danger">
-                    <div class="card-header bg-danger text-white text-center">
-                        <h5>Blocked Users</h5>
+                <div class="card shadow-lg border-info">
+                    <div class="card-header bg-info text-white text-center">
+                        <h5>Total Events</h5>
                     </div>
                     <div class="card-body text-center">
-                        <h3 class="card-title">@ViewBag.BlockedUsersCount</h3>
-                        <p class="card-text">The number of users who are currently blocked from the system.</p>
+                        <h3 class="card-title">@ViewBag.EventCount</h3>
+                        <p class="card-text">The total number of events in the system.</p>
                     </div>
                 </div>
             </div>
+
+            <!-- Card 5: Available Events -->
             <div class="col-md-6 col-lg-4 mb-4">
-                <div class="card shadow-lg border-danger">
-                    <div class="card-header bg-danger text-white text-center">
-                        <h5>Blocked Users</h5>
+                <div class="card shadow-lg border-success">
+                    <div class="card-header bg-success text-white text-center">
+                        <h5>Available Events</h5>
                     </div>
                     <div class="card-body text-center">
-                        <h3 class="card-title">@ViewBag.BlockedUsersCount</h3>
-                        <p class="card-text">The number of users who are currently blocked from the system.</p>
+                        <h3 class="card-title">@ViewBag.AvailableEventsCount</h3>
+                        <p class="card-text">Events currently available for registration.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 6: Past Events -->
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="card shadow-lg border-secondary">
+                    <div class="card-header bg-secondary text-white text-center">
+                        <h5>Past Events</h5>
+                    </div>
+                    <div class="card-body text-center">
+                        <h3 class="card-title">@ViewBag.PastEventsCount</h3>
+                        <p class="card-text">Events that have already ended.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 7: Today's Events -->
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="card shadow-lg border-warning">
+                    <div class="card-header bg-warning text-white text-center">
+                        <h5>Today's Events</h5>
+                    </div>
+                    <div class="card-body text-center">
+                        <h3 class="card-title">@ViewBag.TodayEventsCount</h3>
+                        <p class="card-text">Events happening today.</p>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 </div>
-
-
-

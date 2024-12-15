@@ -1,0 +1,80 @@
+﻿/* الحاوية الأساسية */
+#loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: rgba(255, 255, 255, 0.9); /* خلفية بيضاء مع شفافية */
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}
+
+/* حاوية النقاط */
+.dots {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 180px;
+    height: 180px; /* زيادة الطول لتناسب حركة النقاط من أعلى إلى أسفل */
+    position: relative;
+}
+
+/* تصميم كل نقطة (جعلها بيضاوية) */
+.dot {
+    width: 40px; /* جعل العرض أكبر */
+    height: 30px; /* جعل الارتفاع أصغر */
+    border-radius: 50%;
+    background-color: #ff6a00; /* اللون البرتقالي */
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.5); /* زيادة قوة الظل لإعطاء إحساس بالعمق */
+    position: absolute;
+    animation: bounceVertical 1.5s infinite ease-in-out, bounceHorizontal 1.5s infinite ease-in-out;
+}
+
+/* تحريك النقاط باستخدام @keyframes */
+@keyframes bounceVertical {
+    0%, 100% {
+        top: 0;
+        background-color: #ff6a00; /* اللون البرتقالي */
+    }
+
+    50% {
+        top: 60px; /* الحركة من أعلى إلى أسفل */
+        background-color: #ffffff; /* اللون الأبيض */
+    }
+}
+
+@keyframes bounceHorizontal {
+    0%, 100% {
+        left: 0;
+    }
+
+    50% {
+        left: 60px; /* الحركة من اليسار إلى اليمين */
+    }
+}
+
+/* إضافة تأخيرات لكل نقطة لتحديد توقيت الحركة */
+.dot:nth-child(1) {
+    animation-delay: 0s;
+    background-color: #000000; /* اللون الأسود */
+}
+
+.dot:nth-child(2) {
+    animation-delay: 0.3s;
+    background-color: #ff6a00; /* اللون البرتقالي */
+}
+
+.dot:nth-child(3) {
+    animation-delay: 0.6s;
+    background-color: #ffffff; /* اللون الأبيض */
+}
+
+/* تحسين المظهر العام */
+body {
+    margin: 0;
+    font-family: 'Arial', sans-serif;
+    background-color: #f5f5f5; /* خلفية الصفحة الفاتحة */
+}

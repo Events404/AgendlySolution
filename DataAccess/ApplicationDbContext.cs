@@ -15,9 +15,8 @@ namespace Agendly.Data
         public DbSet<WishList> wishLists { get; set; }
         public DbSet<Booking> Bookings { get; set; }
         public DbSet<Report> Reports { get; set; }
-
-
-
+        public DbSet<LikeDislike> LikeDislikes { get; set; }
+        public DbSet<Notification> notifications { get; set; }
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
         {

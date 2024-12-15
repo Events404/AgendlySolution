@@ -32,9 +32,9 @@ namespace Agendly.Controllers
                 categoryRepository.create(categorie);
                 categoryRepository.commit();
                 TempData["success"] = "Category added successfully!";
-                return RedirectToAction(nameof(Index));  // سيتم إعادة تحميل نفس الصفحة بعد إضافة الفئة
+                return RedirectToAction(nameof(Index));  
             }
-            return RedirectToAction(nameof(Index));  // في حال حدوث خطأ، سيتم البقاء على نفس الصفحة
+            return RedirectToAction(nameof(Index)); 
         }
 
         [HttpPost]
@@ -46,9 +46,9 @@ namespace Agendly.Controllers
                 categoryRepository.Edit(categorie);
                 categoryRepository.commit();
                 TempData["success"] = "Category updated successfully!";
-                return RedirectToAction(nameof(Index));  // سيتم إعادة تحميل نفس الصفحة بعد التعديل
+                return RedirectToAction(nameof(Index));  
             }
-            return RedirectToAction(nameof(Index));  // في حال حدوث خطأ، سيتم البقاء على نفس الصفحة
+            return RedirectToAction(nameof(Index)); 
         }
 
         [HttpPost]
@@ -62,7 +62,7 @@ namespace Agendly.Controllers
                 categoryRepository.commit();
                 TempData["success"] = "Category deleted successfully!";
             }
-            return RedirectToAction(nameof(Index));  // سيتم إعادة تحميل نفس الصفحة بعد الحذف
+            return RedirectToAction(nameof(Index));  
         }
     }
 

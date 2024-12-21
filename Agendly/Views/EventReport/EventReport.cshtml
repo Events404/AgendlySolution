@@ -1,0 +1,163 @@
+﻿@using Utility.ViewModel
+@model EventReportViewModel
+@{
+    ViewData["Title"] = "EventReport";
+    Layout = "~/Areas/Identity/Pages/Account/Manage/_DashboardUserLayout.cshtml";
+}
+
+<div class="event-report">
+    <h2 class="event-name">@Model.EventDetails.Name</h2>
+
+    <div class="event-summary">
+        <h3 class="summary-title">Event Overview</h3>
+        <div class="summary-item">
+            <span class="summary-label">Description:</span>
+            <p class="summary-value">@Model.EventDetails.Description</p>
+        </div>
+        <div class="summary-item">
+            <span class="summary-label">Start Date:</span>
+            <p class="summary-value">@Model.EventDetails.StartDate.ToString("yyyy-MM-dd")</p>
+        </div>
+        <div class="summary-item">
+            <span class="summary-label">End Date:</span>
+            <p class="summary-value">@Model.EventDetails.EndDate.ToString("yyyy-MM-dd")</p>
+        </div>
+        <div class="summary-item">
+            <span class="summary-label">Location:</span>
+            <p class="summary-value">@Model.EventDetails.Street, @Model.EventDetails.District, @Model.EventDetails.City, @Model.EventDetails.Country</p>
+        </div>
+        <div class="summary-item">
+            <span class="summary-label">Price:</span>
+            <p class="summary-value">
+                Price: @(Model.EventDetails.Price.HasValue ? $"{Model.EventDetails.Price:C}" : "Free")
+            </p>
+        </div>
+        <div class="summary-item">
+            <span class="summary-label">Seats Available:</span>
+            <p class="summary-value">@Model.EventDetails.Seats</p>
+        </div>
+        <div class="summary-item highlight">
+            <span class="summary-label">View Count:</span>
+            <p class="summary-value">@Model.ViewCount</p>
+        </div>
+    </div>
+
+    <h3 class="sponsored-ads-title">Sponsored Ads</h3>
+    @if (Model.SponsoredAds.Any())
+    {
+        <div class="sponsored-ads">
+            @foreach (var ad in Model.SponsoredAds)
+            {
+                <div class="sponsored-ad">
+                    <h4>@ad.Title</h4>
+                    <p><strong>Description:</strong> @ad.Description</p>
+                    <p><strong>Price:</strong> @ad.Price.ToString("C")</p>
+                    <p><strong>Duration:</strong> @ad.Duration days</p>
+                    <p><strong>Status:</strong> @(ad.IsPaid ? "Paid" : "Unpaid")</p>
+                    <p><strong>Created At:</strong> @ad.CreatedAt.ToString("yyyy-MM-dd")</p>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <p>No sponsored ads for this event.</p>
+    }
+</div>
+
+<!-- إضافة تصميم احترافي باستخدام CSS -->
+
+<style>
+    .event-report {
+        font-family: Arial, sans-serif;
+        padding: 20px;
+        max-width: 900px;
+        margin: 0 auto;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        background-color: #f9f9f9;
+    }
+
+    .event-name {
+        text-align: center;
+        font-size: 32px;
+        color: #333;
+        margin-bottom: 20px;
+    }
+
+    .event-summary {
+        margin-top: 20px;
+        padding: 20px;
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    .summary-title {
+        font-size: 24px;
+        color: #333;
+        margin-bottom: 20px;
+    }
+
+    .summary-item {
+        margin-bottom: 15px;
+    }
+
+    .summary-label {
+        font-size: 16px;
+        color: #555;
+        font-weight: bold;
+    }
+
+    .summary-value {
+        font-size: 16px;
+        color: #333;
+        margin-top: 5px;
+    }
+
+    .highlight {
+        background-color: #f0f8ff;
+        padding: 10px;
+        border-radius: 5px;
+    }
+
+    .sponsored-ads-title {
+        font-size: 24px;
+        color: #333;
+        margin-top: 40px;
+    }
+
+    .sponsored-ads {
+        margin-top: 20px;
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    .sponsored-ad {
+        margin-bottom: 20px;
+    }
+
+        .sponsored-ad h4 {
+            font-size: 20px;
+            color: #333;
+        }
+
+        .sponsored-ad p {
+            font-size: 14px;
+            color: #777;
+        }
+
+    /* Add a footer section */
+    .footer {
+        margin-top: 40px;
+        text-align: center;
+        color: #777;
+    }
+
+        .footer p {
+            font-size: 14px;
+        }
+
+</style>

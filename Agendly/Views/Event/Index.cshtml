@@ -1,64 +1,81 @@
-﻿@model Utility.ViewModel.EventIndexViewModel
-
-@{
-    ViewData["Title"] = "Events";
-    Layout = "~/Views/Shared/_Layout.cshtml";
-}
-
-<div class="container mt-4">
-    <h1>@ViewData["Title"]</h1>
+﻿<div class="container mt-5">
+    <h1 class="text-center display-4">@ViewData["Title"]</h1>
 
     <!-- شريط البحث -->
     <form method="get" action="@Url.Action("Index", "Event")" class="d-flex justify-content-center mb-4">
-        <input type="text" name="searchQuery" value="@Model.SearchQuery" class="form-control w-50" placeholder="Search events..." />
+        <input type="text" name="searchQuery" value="@Model.SearchQuery" class="form-control w-50 shadow-sm" placeholder="Search events...">
         <button type="submit" class="btn btn-primary ms-2">Search</button>
     </form>
 
     <!-- الفلاتر -->
     <div class="text-center mb-4">
-        <a href="@Url.Action("Index", "Event", new { filter = "all" })" class="btn btn-secondary mx-2">All</a>
-        <a href="@Url.Action("Index", "Event", new { filter = "available" })" class="btn btn-success mx-2">Available</a>
-        <a href="@Url.Action("Index", "Event", new { filter = "past" })" class="btn btn-danger mx-2">Past</a>
-        <a href="@Url.Action("Index", "Event", new { filter = "today" })" class="btn btn-info mx-2">Today</a>
+        <a href="@Url.Action("Index", "Event", new { filter = "all" })" class="btn btn-outline-primary mx-2">All</a>
+        <a href="@Url.Action("Index", "Event", new { filter = "available" })" class="btn btn-outline-success mx-2">Available</a>
+        <a href="@Url.Action("Index", "Event", new { filter = "past" })" class="btn btn-outline-danger mx-2">Past</a>
+        <a href="@Url.Action("Index", "Event", new { filter = "today" })" class="btn btn-outline-info mx-2">Today</a>
     </div>
 
     <!-- عرض الأحداث -->
-    <div class="row row-cols-1 row-cols-md-3 g-4">
+    <div class="row g-4">
         @foreach (var eventItem in Model.Events)
         {
-            <div class="col">
-                <div class="card h-100">
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-lg rounded-3 position-relative overflow-hidden
+                    @(eventItem.IsSponsored ? "border-custom" : "border-primary")">
+
                     <!-- صورة الحدث -->
-                    <img src="~/imgEvent/@eventItem.UrlImg" class="card-img-top" alt="Event image" style="height: 200px; object-fit: cover;">
-                    <div class="card-body">
-                        <h5 class="card-title">@eventItem.Name</h5>
-                        <p class="card-text">@eventItem.Description</p>
+                    <img src="~/imgEvent/@eventItem.UrlImg" class="card-img-top event-img rounded-3" alt="Event image">
+
+                    <!-- لافتة للحدث الممول -->
+                    @if (eventItem.IsSponsored)
+                    {
+                        <div class="position-absolute top-0 end-0 p-2 bg-custom text-white rounded-start custom-sponsored-badge">
+                            Sponsored <i class="fa fa-check-circle"></i>
+                        </div>
+                    }
+
+                    <div class="card-body @(eventItem.IsSponsored ? "bg-light-custom" : "bg-light")">
+                        <h5 class="card-title fw-bold @(eventItem.IsSponsored ? "text-custom" : "text-primary")">
+                            @eventItem.Name
+                            @if (eventItem.IsSponsored)
+                            {
+                                <i class="fa fa-check-circle text-custom ms-2" title="Verified Organizer"></i>
+                            }
+                        </h5>
+                        <p class="card-text text-muted text-truncate" style="max-height: 50px;">@eventItem.Description</p>
                     </div>
-                    <div class="card-footer d-flex justify-content-between">
-                        <small class="text-muted">@eventItem.StartDateHumanized</small>
-                        <small class="text-muted">@eventItem.User.FirstName</small>
+
+                    <!-- تفاصيل إضافية -->
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item">Start Date: @eventItem.StartDateHumanized</li>
+                        <li class="list-group-item text-danger">End Date: @eventItem.EndDate.ToString("g")</li>
+
+                        <li class="list-group-item @(eventItem.IsSponsored ? "text-custom" : "text-muted")">
+                            Organizer: @eventItem.User.FirstName
+                        </li>
+                    </ul>
+
+                    <div class="card-footer bg-white text-center">
+                        <a href="@Url.Action("Details", "Event", new { id = eventItem.Id })"
+                           class="btn @(eventItem.IsSponsored ? "btn-custom" : "btn btn-lg btn-primary") w-100 py-2">
+                            View Details
+                        </a>
                     </div>
-                    <!-- زر التفاصيل -->
-                    <div class="card-footer text-center">
-                        <a href="@Url.Action("Details", "Event", new { id = eventItem.Id })" class="btn btn-primary">View Details</a>
-                    </div>
-                    <!-- عرض تاريخ الانتهاء باللون الأحمر -->
-                    <div class="card-footer text-center">
-                        <span class="text-danger">End Date: @eventItem.EndDate.ToString("g")</span>
-                    </div>
+
+
                 </div>
             </div>
         }
     </div>
 
     <!-- التصفح بين الصفحات -->
-    <div class="d-flex justify-content-center mt-4">
+    <div class="d-flex justify-content-center mt-5">
         @if (Model.CurrentPage > 1)
         {
             <a href="@Url.Action("Index", "Event", new { page = Model.CurrentPage - 1, filter = Model.Filter, searchQuery = Model.SearchQuery })" class="btn btn-outline-secondary me-2">Previous</a>
         }
 
-        <span class="d-flex align-items-center">
+        <span class="d-flex align-items-center mx-3">
             Page @Model.CurrentPage of @Model.TotalPages
         </span>
 
@@ -68,3 +85,50 @@
         }
     </div>
 </div>
+
+<style>
+
+    /* تصغير حجم اللافتة الممولة */
+    .custom-sponsored-badge {
+        animation: pulse 1.5s infinite;
+        font-weight: bold;
+        font-size: 0.9rem; /* تصغير حجم النص */
+        border-radius: 8px;
+        padding: 3px 8px; /* تقليل المسافات */
+    }
+
+    /* تحسين الزر البرتقالي */
+    .btn-custom {
+        background-color: #FF5722;
+        border-color: #FF5722;
+        font-weight: bold;
+        text-transform: uppercase;
+    }
+
+        .btn-custom:hover {
+            background-color: #e64a19;
+            border-color: #e64a19;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-custom:focus {
+            outline: none;
+            box-shadow: 0 0 5px rgba(255, 87, 34, 0.8);
+        }
+
+    /* إضافة التعديل على العلامة الموثقة بجانب اسم المنظم */
+    .text-custom {
+        color: #FF5722;
+    }
+
+    .fa-check-circle {
+        font-size: 1.2rem; /* تكبير الأيقونة */
+        margin-left: 5px;
+    }
+
+    .text-custom {
+        color: #FF5722; /* البرتقالي */
+        font-weight: bold;
+    }
+
+</style>

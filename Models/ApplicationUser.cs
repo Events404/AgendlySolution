@@ -32,6 +32,7 @@ namespace Models
 
         public List<Booking> Bookings { get; set; } 
         public List<WishList> WishLists { get; set; } 
-        public List<Event> Events { get; set; } 
+        public List<Event> Events { get; set; }
+
     }
 }

@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Models;
+using System.Reflection.Emit;
 
 namespace Agendly.Data
 {
@@ -17,6 +18,8 @@ namespace Agendly.Data
         public DbSet<Report> Reports { get; set; }
         public DbSet<LikeDislike> LikeDislikes { get; set; }
         public DbSet<Notification> notifications { get; set; }
+       
+        public DbSet<SponsoredAd> sponsoredAds { get; set; }
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
         {
@@ -54,9 +57,18 @@ namespace Agendly.Data
                 .HasOne(e => e.User) // العلاقة بين Event و User
                 .WithMany(u => u.Events) // المستخدم يمكن أن يكون له عدة Events
                 .HasForeignKey(e => e.UserId) // المفتاح الأجنبي في Event
-                .OnDelete(DeleteBehavior.NoAction);  // لا يتم حذف الـ Event إذا تم حذف المستخدم
+                .OnDelete(DeleteBehavior.NoAction);
+            // لا يتم حذف الـ Event إذا تم حذف المستخدم
+
+            // تكوين العلاقة بين Event و SponsoredAd
+            builder.Entity<Event>()
+                .HasOne(e => e.SponsoredAd)
+                .WithOne(sa => sa.Event)
+                .HasForeignKey<Event>(e => e.SponsoredAdId);
         }
 
-
     }
+
+
 }
+

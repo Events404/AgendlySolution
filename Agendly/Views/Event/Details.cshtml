@@ -1,10 +1,10 @@
 ﻿@model Models.Event
 
+
 @{
     ViewData["Title"] = "Event Details";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
-
 <div class="container py-5">
     <!-- Countdown Section -->
     <div class="row mb-5">
@@ -17,7 +17,6 @@
             </div>
         </div>
     </div>
-
     <!-- Event Details -->
     <div class="row">
         <div class="col-lg-8">
@@ -28,7 +27,6 @@
                         <i class="fas fa-calendar-alt"></i> @Model.Name
                     </h3>
                     <p class="text-muted">@Model.Description</p>
-
                     <h5 class="mt-4 text-secondary">
                         <i class="fas fa-map-marker-alt text-danger"></i> Location
                     </h5>
@@ -38,13 +36,11 @@
                             <i class="fas fa-map-marked-alt"></i> View on Map
                         </a>
                     </p>
-
                     <p><strong>Start Date:</strong> @Model.StartDate.ToString("dd MMM yyyy HH:mm")</p>
                     <p><strong>End Date:</strong> @Model.EndDate.ToString("dd MMM yyyy HH:mm")</p>
                 </div>
             </div>
         </div>
-
         <!-- User Information -->
         <div class="col-lg-4">
             <div class="card shadow border-0 mb-4">
@@ -52,9 +48,13 @@
                     <h5 class="text-primary">
                         <i class="fas fa-user"></i> Event Added By
                     </h5>
+                    @if (Model.IsSponsored)
+                    {
+                        <p><strong>Name:</strong> @Model.User.FirstName @Model.User.LastName <i class="fa-regular fa-shield-check" style="color: #e64a19;"></i></p>
+
+                    }
                     <p><strong>Name:</strong> @Model.User.FirstName @Model.User.LastName</p>
                     <p><strong>Email:</strong> @Model.User.Email</p>
-
                     <a href="mailto:@Model.User.Email" class="btn btn-outline-primary w-100 mt-3">
                         <i class="fas fa-envelope"></i> Contact
                     </a>
@@ -77,10 +77,8 @@
                     <p class="mt-2 text-muted" id="likeDislikeMessage"></p>
                 </div>
             </div>
-
         </div>
     </div>
-
     <!-- Category Section -->
     <div class="row mb-4">
         <div class="col">
@@ -97,7 +95,6 @@
             </div>
         </div>
     </div>
-
     <!-- Availability Section -->
     <div class="row mb-4">
         <div class="col">
@@ -118,22 +115,24 @@
             </div>
         </div>
     </div>
-
-    <!-- Available Seats Section without Progress Bar -->
-    <div class="row mb-4">
-        <div class="col">
-            <div class="card shadow border-0 p-4">
-                <h5 class="text-secondary">
-                    <i class="fas fa-chair"></i> Available Seats:
-                    <span id="seats-available" class="text-dark fw-bold">@Model.Seats</span>
-                </h5>
-                <label for="numberOfSeats" class="form-label mt-3">Enter number of seats to reserve:</label>
-                <input type="number" id="numberOfSeats" class="form-control" min="1" max="@Model.Seats" />
-
-                <button id="reserveBtn" class="btn btn-primary w-100 mt-3" disabled>Reserve Now</button>
+    <form method="post" action="@Url.Action("ReserveSeatsWithPayment", "Event")">
+        <input type="hidden" name="eventId" value="@Model.Id" /> <!-- إضافة حقل مخفي لeventId -->
+        <div class="row mb-4">
+            <div class="col">
+                <div class="card shadow border-0 p-4">
+                    <h5 class="text-secondary">
+                        <i class="fas fa-chair"></i> Available Seats:
+                        <span id="seats-available" class="text-dark fw-bold">@Model.Seats</span>
+                    </h5>
+                    <label for="numberOfSeats" class="form-label mt-3">Enter number of seats to reserve:</label>
+                    <input type="number" id="numberOfSeats" name="numberOfSeats" class="form-control" min="1" max="@Model.Seats" />
+                    <button id="reserveBtn" type="submit" class="btn btn-primary w-100 mt-3">
+                        Reserve Now
+                    </button>
+                </div>
             </div>
         </div>
-    </div>
+    </form>
 
     <!-- Comments Section -->
     <div class="row mb-5">
@@ -142,9 +141,9 @@
                 <h5 class="text-primary fw-bold">
                     <i class="fas fa-comments"></i> Comments
                 </h5>
-
                 <!-- New Comment Form -->
                 <form id="commentForm" class="mb-3">
+
                     <div id="alertContainer"></div>
                     <div class="mb-3">
                         <textarea class="form-control" id="commentText" rows="3" placeholder="Leave a comment..." required></textarea>
@@ -156,7 +155,6 @@
                         <i class="fas fa-comments"></i> Comments (@ViewBag.CommentsCount)
                     </h5>
                 </small>
-
                 <!-- Comments List -->
                 <div id="commentsList">
                     @foreach (var comment in Model.Comments)
@@ -173,16 +171,13 @@
             </div>
         </div>
     </div>
-
     @section Scripts {
         <script>
             // Event Countdown Timer
             var eventDate = new Date('@Model.StartDate.ToString("yyyy-MM-ddTHH:mm:ss")').getTime();
-
             var countdownFunction = setInterval(function () {
                 var now = new Date().getTime();
                 var distance = eventDate - now;
-
                 var days = Math.floor(distance / (1000 * 60 * 60 * 24));
                 var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
                 var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
@@ -199,45 +194,41 @@
 
             // Enable Reserve Button
             document.getElementById('numberOfSeats').addEventListener('input', function () {
-                var numberOfSeats = document.getElementById('numberOfSeats').value;
+                var numberOfSeats = parseInt(document.getElementById('numberOfSeats').value);
                 var availableSeats = parseInt(document.getElementById('seats-available').textContent);
-
                 document.getElementById('reserveBtn').disabled = !(numberOfSeats > 0 && numberOfSeats <= availableSeats);
             });
-            // Reserve Seats
-            document.getElementById('reserveBtn').addEventListener('click', function () {
-                var numberOfSeats = document.getElementById('numberOfSeats').value;
 
-                $.ajax({
-                    type: 'POST',
-                    url: '@Url.Action("ReserveSeats", "Event")',
-                    data: {
-                        id: @Model.Id,
-                        numberOfSeats: numberOfSeats
-                    },
-                    success: function (response) {
-                        if (response.success) {
-                            alert(response.message);
+            // // Reserve Seats
+            // document.getElementById('reserveBtn').addEventListener('click', function () {
+            //     var numberOfSeats = document.getElementById('numberOfSeats').value;
 
-                            // Update seats available from server response
-                            document.getElementById('seats-available').textContent = response.updatedSeats;
-                        } else {
-                            alert(response.message);
-                        }
-                    },
-                    error: function () {
-                        alert('An error occurred. Please try again.');
-                    }
-                });
-            });
-
+            //     $.ajax({
+            //         type: 'POST',
+            //         url: '@Url.Action("ReserveSeatsWithPayment", "Event")',
+            //         data: {
+            //             id: @Model.Id,
+            //             numberOfSeats: numberOfSeats
+            //         },
+            //         success: function (response) {
+            //             if (response.success) {
+            //                 alert(response.message);
+            //                 document.getElementById('seats-available').textContent = response.updatedSeats; // Update seats
+            //             } else {
+            //                 alert(response.message);
+            //             }
+            //         },
+            //         error: function () {
+            //             alert('An error occurred. Please try again.');
+            //         }
+            //     });
+            // });
 
             // Submit Comment
             document.getElementById('commentForm').addEventListener('submit', function (e) {
                 e.preventDefault();
                 var commentText = document.getElementById('commentText').value;
 
-                // Call API to post comment
                 $.ajax({
                     type: 'POST',
                     url: '@Url.Action("AddComment", "Event")',
@@ -248,16 +239,15 @@
                     success: function (response) {
                         if (response.success) {
                             var newComment = `
-                                            <div class="mb-3 border-bottom pb-2">
-                                                <div class="d-flex justify-content-between align-items-center">
-                                                    <h6 class="text-primary">${response.userName}</h6>
-                                                    <span class="text-muted">${response.postedDate}</span>
-                                                </div>
-                                                <p>${response.commentText}</p>
-                                            </div>
-                                        `;
+                                    <div class="mb-3 border-bottom pb-2">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <h6 class="text-primary">${response.userName}</h6>
+                                            <span class="text-muted">${response.postedDate}</span>
+                                        </div>
+                                        <p>${response.commentText}</p>
+                                    </div>`;
                             document.getElementById('commentsList').innerHTML += newComment;
-                            document.getElementById('commentText').value = ''; // Clear the comment box
+                            document.getElementById('commentText').value = ''; // Clear input
                         } else {
                             alert(response.message);
                         }
@@ -267,65 +257,64 @@
                     }
                 });
             });
-           document.getElementById('likeBtn').addEventListener('click', function () {
-    handleLikeDislike(true);
-});
+            
+            // Like/Dislike Buttons
+            document.getElementById('likeBtn').addEventListener('click', function () {
+                handleLikeDislike(true);
+            });
 
-document.getElementById('dislikeBtn').addEventListener('click', function () {
-    handleLikeDislike(false);
-});
+            document.getElementById('dislikeBtn').addEventListener('click', function () {
+                handleLikeDislike(false);
+            });
 
-function handleLikeDislike(isLike) {
-    $.ajax({
-        type: 'POST',
-        url: '@Url.Action("AddLikeDislike", "Event")',
-        data: {
-            eventId: @Model.Id,
-            isLike: isLike
-        },
-        success: function (response) {
-            const messageElement = document.getElementById('likeDislikeMessage');
-            const likeBtn = document.getElementById('likeBtn');
-            const dislikeBtn = document.getElementById('dislikeBtn');
-            const likeCount = document.getElementById('likeCount');
-            const dislikeCount = document.getElementById('dislikeCount');
+            function handleLikeDislike(isLike) {
+                $.ajax({
+                    type: 'POST',
+                    url: '@Url.Action("AddLikeDislike", "Event")',
+                    data: {
+                        eventId: @Model.Id,
+                        isLike: isLike
+                    },
+                    success: function (response) {
+                        const messageElement = document.getElementById('likeDislikeMessage');
+                        const likeBtn = document.getElementById('likeBtn');
+                        const dislikeBtn = document.getElementById('dislikeBtn');
+                        const likeCount = document.getElementById('likeCount');
+                        const dislikeCount = document.getElementById('dislikeCount');
 
-            if (response.success) {
-                messageElement.textContent = response.message;
-                messageElement.classList.remove('text-danger');
-                messageElement.classList.add('text-success');
+                        if (response.success) {
+                            messageElement.textContent = response.message;
+                            messageElement.classList.remove('text-danger');
+                            messageElement.classList.add('text-success');
 
-                // Update counts
-                likeCount.textContent = response.likeCount;
-                dislikeCount.textContent = response.dislikeCount;
+                            likeCount.textContent = response.likeCount;
+                            dislikeCount.textContent = response.dislikeCount;
 
-                // Toggle button state
-                if (isLike) {
-                    likeBtn.classList.add('btn-success');
-                    likeBtn.classList.remove('btn-outline-success');
-                    dislikeBtn.classList.add('btn-outline-danger');
-                    dislikeBtn.classList.remove('btn-danger');
-                } else {
-                    dislikeBtn.classList.add('btn-danger');
-                    dislikeBtn.classList.remove('btn-outline-danger');
-                    likeBtn.classList.add('btn-outline-success');
-                    likeBtn.classList.remove('btn-success');
-                }
-            } else {
-                messageElement.textContent = response.message;
-                messageElement.classList.remove('text-success');
-                messageElement.classList.add('text-danger');
+                            if (isLike) {
+                                likeBtn.classList.add('btn-success');
+                                likeBtn.classList.remove('btn-outline-success');
+                                dislikeBtn.classList.add('btn-outline-danger');
+                                dislikeBtn.classList.remove('btn-danger');
+                            } else {
+                                dislikeBtn.classList.add('btn-danger');
+                                dislikeBtn.classList.remove('btn-outline-danger');
+                                likeBtn.classList.add('btn-outline-success');
+                                likeBtn.classList.remove('btn-success');
+                            }
+                        } else {
+                            messageElement.textContent = response.message;
+                            messageElement.classList.remove('text-success');
+                            messageElement.classList.add('text-danger');
+                        }
+                    },
+                    error: function () {
+                        const messageElement = document.getElementById('likeDislikeMessage');
+                        messageElement.textContent = 'An error occurred. Please try again.';
+                        messageElement.classList.remove('text-success');
+                        messageElement.classList.add('text-danger');
+                    }
+                });
             }
-        },
-        error: function () {
-            const messageElement = document.getElementById('likeDislikeMessage');
-            messageElement.textContent = 'An error occurred. Please try again.';
-            messageElement.classList.remove('text-success');
-            messageElement.classList.add('text-danger');
-        }
-    });
-}
-
         </script>
     }
 </div>

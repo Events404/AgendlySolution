@@ -6,6 +6,8 @@ using System.Linq.Expressions;
 using DataAccess.Repository;
 using Humanizer;
 using Utility.ViewModel;
+using Microsoft.AspNetCore.Identity.UI.Services;
+using Stripe.Checkout;
 
 namespace Agendly.Controllers
 {
@@ -17,8 +19,9 @@ namespace Agendly.Controllers
         private readonly CommentIRepository commentIRepository;
         private readonly LikeDisLikeIRepository likeDisLikeIRepository;
         private readonly NotificationIRepository notificationIRepository;
+        private readonly IEmailSender emailSender;
 
-        public EventController(EventIRepository eventIRepository, UserManager<ApplicationUser> userManager, CategoryIRepository categoryIRepository, CommentIRepository commentIRepository , LikeDisLikeIRepository likeDisLikeIRepository , NotificationIRepository notificationIRepository)
+        public EventController(EventIRepository eventIRepository, UserManager<ApplicationUser> userManager, CategoryIRepository categoryIRepository, CommentIRepository commentIRepository , LikeDisLikeIRepository likeDisLikeIRepository , NotificationIRepository notificationIRepository , IEmailSender emailSender)
         {
             this.eventIRepository = eventIRepository;
             this.userManager = userManager;
@@ -26,6 +29,7 @@ namespace Agendly.Controllers
             this.commentIRepository = commentIRepository;
             this.likeDisLikeIRepository = likeDisLikeIRepository;
             this.notificationIRepository = notificationIRepository;
+            this.emailSender = emailSender;
         }
 
 
@@ -229,6 +233,9 @@ namespace Agendly.Controllers
             eventIRepository.create(modelevent);
             eventIRepository.commit();
 
+          
+
+
             TempData["success"] = "Event created successfully.";
             return RedirectToAction(nameof(Index));
         }
@@ -252,21 +259,31 @@ namespace Agendly.Controllers
             }
 
             eventItem.Available = eventItem.Seats > 0 && eventItem.StartDate > DateTime.Now;
+            eventItem.ViewCount++;
+            eventIRepository.Edit(eventItem);
+            eventIRepository.commit();
 
             return View(eventItem);
         }
 
 
         [HttpPost]
-        public IActionResult ReserveSeats(int id, int numberOfSeats)
+        public async Task<IActionResult> ReserveSeats(int eventId, int numberOfSeats)
         {
+            if (!User.Identity.IsAuthenticated)
+            {
+                return Json(new { success = false, message = "Please log in to reserve seats." });
+            }
+
+            var user = await userManager.GetUserAsync(User);
+            if (user == null)
+            {
+                return Json(new { success = false, message = "User not found." });
+            }
+
             var eventItem = eventIRepository.GetFirstOrDefault(
-                expression: e => e.Id == id,
-                includeProp: new Expression<Func<Event, object>>[]
-                {
-            e => e.Categorie,
-            e => e.User
-                }
+                expression: e => e.Id == eventId,
+                includeProp: new Expression<Func<Event, object>>[] { e => e.Categorie, e => e.User }
             );
 
             if (eventItem == null)
@@ -284,12 +301,24 @@ namespace Agendly.Controllers
                 return Json(new { success = false, message = "Invalid number of seats." });
             }
 
+            // حساب التكلفة الإجمالية
+            var totalPrice = eventItem.Price * numberOfSeats;
+
+            // تحديث المقاعد المتاحة
             eventItem.Seats -= numberOfSeats;
+            eventItem.Available = eventItem.Seats > 0 && eventItem.StartDate > DateTime.Now;
+
             eventIRepository.Edit(eventItem);
             eventIRepository.commit();
 
-            return Json(new { success = true, message = $"Successfully reserved {numberOfSeats} seats." });
+            return Json(new
+            {
+                success = true,
+                message = $"Successfully reserved {numberOfSeats} seats.",
+                totalPrice = totalPrice
+            });
         }
+
         public IActionResult Delete(int id)
         {
             var eventItem = eventIRepository.GetFirstOrDefault(e => e.Id == id);
@@ -317,13 +346,13 @@ namespace Agendly.Controllers
             }
 
             var events = eventIRepository.Get(
-                expression: e => e.UserId == user.Id,  
-                includeProp: new Expression<Func<Event, object>>[] { e => e.User }
+                expression: e => e.UserId == user.Id,
+                includeProp: new Expression<Func<Event, object>>[] { e => e.User, e => e.SponsoredAd }
             ).ToList();
 
             foreach (var eventItem in events)
             {
-                eventItem.StartDateHumanized = eventItem.StartDate.Humanize(); 
+                eventItem.StartDateHumanized = eventItem.StartDate.Humanize();
             }
 
             var totalEvents = events.Count();
@@ -340,7 +369,6 @@ namespace Agendly.Controllers
 
             return View(model);
         }
-
 
         [HttpPost]
         public async Task<IActionResult> AddComment(int eventId, string commentContent)
@@ -433,5 +461,107 @@ namespace Agendly.Controllers
         }
 
 
+        [HttpPost]
+        public async Task<IActionResult> ReserveSeatsWithPayment(int eventId, int numberOfSeats)
+        {
+            if (!User.Identity.IsAuthenticated)
+            {
+                TempData["error"] = "Please log in to reserve seats.";
+                return RedirectToAction("Login", "Account");
+            }
+
+            var user = await userManager.GetUserAsync(User);
+            if (user == null)
+            {
+                TempData["error"] = "User not found.";
+                return RedirectToAction("Index");
+            }
+
+            var eventItem = eventIRepository.GetFirstOrDefault(
+                expression: e => e.Id == eventId,
+                includeProp: new Expression<Func<Event, object>>[] { e => e.Categorie, e => e.User }
+            );
+
+            if (eventItem == null)
+            {
+                TempData["error"] = "Event not found.";
+                return RedirectToAction("Index");
+            }
+
+            if (!eventItem.Available)
+            {
+                TempData["error"] = "Event is not available for reservation.";
+                return RedirectToAction("Details", new { id = eventId });
+            }
+
+            if (numberOfSeats <= 0 || numberOfSeats > eventItem.Seats)
+            {
+                TempData["error"] = "Invalid number of seats.";
+                return RedirectToAction("Details", new { id = eventId });
+            }
+
+            var totalPrice = eventItem.Price * numberOfSeats;
+
+            var domain = $"{Request.Scheme}://{Request.Host}";
+            var options = new SessionCreateOptions
+            {
+                PaymentMethodTypes = new List<string> { "card" },
+                LineItems = new List<SessionLineItemOptions>
+        {
+            new SessionLineItemOptions
+            {
+                PriceData = new SessionLineItemPriceDataOptions
+                {
+                    Currency = "usd",
+                    ProductData = new SessionLineItemPriceDataProductDataOptions
+                    {
+                        Name = $"Reservation for {eventItem.Name}"
+                    },
+                    UnitAmount = (long)(eventItem.Price * 100), // تأكد من أن السعر بالـ cents
+                },
+                Quantity = numberOfSeats,
+            },
+        },
+                Mode = "payment",
+                SuccessUrl = $"{domain}/Event/PaymentSuccess?eventId={eventId}&seats={numberOfSeats}",
+                CancelUrl = $"{domain}/Event/PaymentCancel",
+            };
+
+            var service = new SessionService();
+            var session = service.Create(options);
+
+            return Redirect(session.Url); // إعادة توجيه المستخدم مباشرة إلى Stripe Checkout
+        }
+        [HttpGet]
+        public IActionResult PaymentSuccess(int eventId, int seats)
+        {
+            var eventItem = eventIRepository.GetFirstOrDefault(e => e.Id == eventId);
+
+            if (eventItem == null)
+            {
+                TempData["error"] = "Event not found.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            // تحديث المقاعد المتاحة بعد نجاح الدفع
+            eventItem.Seats -= seats;
+            eventItem.Available = eventItem.Seats > 0 && eventItem.StartDate > DateTime.Now;
+
+            eventIRepository.Edit(eventItem);
+            eventIRepository.commit();
+
+            TempData["success"] = "Payment successful. Seats reserved.";
+            return View();
+        }
+
+        [HttpGet]
+        public IActionResult PaymentCancel()
+        {
+            TempData["error"] = "Payment was canceled.";
+            return View();
+        }
+
+
     }
 }
+

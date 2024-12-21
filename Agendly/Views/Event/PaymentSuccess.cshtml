@@ -1,0 +1,12 @@
+﻿@{
+    ViewData["Title"] = "Event Reservation Success";
+}
+
+<h2><i class="fas fa-check-circle text-success" style="font-size: 50px;"></i> Reservation Successful!</h2>
+<p>Your payment was successful. You have successfully reserved <strong>@TempData["seats"]</strong> seat(s) for the event.</p>
+<p>The event will be displayed shortly. Thank you for your booking!</p>
+<p>An email confirmation with the booking details has also been sent to you.</p>
+
+<a asp-controller="Event" asp-action="Details" class="btn btn-primary" asp-route-id="@TempData["eventId"]">
+    <i class="fas fa-arrow-left"></i> Back to Event
+</a>

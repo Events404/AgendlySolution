@@ -1,0 +1,117 @@
+﻿@using Utility.ViewModel;
+@model AdminReportViewModel
+
+@{
+    ViewData["Title"] = "Admin Report";
+    Layout = "~/Views/_DashboardLayout.cshtml";
+}
+
+<h1 class="mb-4 text-center text-primary">Sponsored Ads Report</h1>
+
+<!-- عرض الأرباح -->
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card shadow-lg border-primary">
+            <div class="card-body">
+                <h5 class="card-title text-primary">Daily Earnings</h5>
+                <p class="card-text fs-4 fw-bold">@Model.TodayEarnings.ToString("C")</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card shadow-lg border-success">
+            <div class="card-body">
+                <h5 class="card-title text-success">Weekly Earnings</h5>
+                <p class="card-text fs-4 fw-bold">@Model.WeeklyEarnings.ToString("C")</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card shadow-lg border-warning">
+            <div class="card-body">
+                <h5 class="card-title text-warning">Monthly Earnings</h5>
+                <p class="card-text fs-4 fw-bold">@Model.MonthlyEarnings.ToString("C")</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- زر استرجاع الأموال -->
+<div class="text-end mb-4">
+    <button class="btn btn-danger btn-lg" data-bs-toggle="modal" data-bs-target="#refundModal">
+        <i class="fas fa-undo"></i> Refund Amount
+    </button>
+</div>
+
+<!-- جدول الإعلانات الممولة -->
+<div class="table-responsive">
+    <table class="table table-bordered table-striped table-hover">
+        <thead class="table-dark">
+            <tr>
+                <th>Title</th>
+                <th>Description</th>
+                <th>Price</th>
+                <th>Duration</th>
+                <th>Created At</th>
+                <th>Is Paid</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var ad in Model.SponsoredAds)
+            {
+                <tr class="@(ad.IsPaid ? "table-success" : "table-danger")">
+                    <td>@ad.Title</td>
+                    <td>@ad.Description</td>
+                    <td>@ad.Price.ToString("C")</td>
+                    <td>@ad.Duration</td>
+                    <td>@ad.CreatedAt.ToString("yyyy-MM-dd")</td>
+                    <td class="text-center">
+                        <span class="badge @(ad.IsPaid ? "bg-success" : "bg-danger") text-white">
+                            @(ad.IsPaid ? "Yes" : "No")
+                        </span>
+                    </td>
+                    <td>
+                        @if (ad.IsPaid)
+                        {
+                            <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#refundModal" onclick="setRefundAdId(@ad.Id)">
+                                <i class="fas fa-credit-card"></i> Refund
+                            </button>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<!-- Modal للتأكيد على استرجاع الأموال -->
+<div class="modal fade" id="refundModal" tabindex="-1" aria-labelledby="refundModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="refundModalLabel"><i class="fas fa-undo"></i> Confirm Refund</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to refund the amount for this sponsored ad? This action cannot be undone.
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <form method="post" action="@Url.Action("ProcessRefund", "SponsoredAd")">
+                    <input type="hidden" id="selectedAdId" name="adId" value="" />
+                    <button type="submit" class="btn btn-danger">Confirm Refund</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let selectedAdId = null;
+
+    function setRefundAdId(adId) {
+        selectedAdId = adId;
+        document.getElementById('selectedAdId').value = selectedAdId;
+    }
+</script>

@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 
 namespace Models
 {
+
     public class Event
     {
 
@@ -77,5 +78,15 @@ namespace Models
         public bool Available { get; set; }
         [ValidateNever]
         public List<LikeDislike>? LikeDislikes { get; set; }
+        [ValidateNever]
+
+        public bool IsSponsored { get; set; }
+        [ValidateNever]
+        public int? SponsoredAdId { get; set; }
+        [ValidateNever]
+        public SponsoredAd SponsoredAd { get; set; }
+
+        [ValidateNever]
+        public int ViewCount { get; set; }
     }
 }

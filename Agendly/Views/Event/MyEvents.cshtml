@@ -2,34 +2,32 @@
 @model EventIndexViewModel
 
 @{
-    ViewData["Title"] = "MyEvents";
+    ViewData["Title"] = "My Events";
     Layout = "~/Areas/Identity/Pages/Account/Manage/_DashboardUserLayout.cshtml";
 }
-
 
 @if (Model.Events == null || !Model.Events.Any())
 {
     <div class="text-center mt-5">
         <i class="fas fa-frown fa-5x text-danger mb-3"></i>
-        <p class="h4 text-muted mb-4">It seems like you don't have any events yet.</p>
+        <p class="h4 text-muted mb-4">It seems you don't have any events yet.</p>
         <p class="lead text-muted">Create your first event by clicking the button below.</p>
         <a href="@Url.Action("Create", "Event")" class="btn btn-lg btn-success">
             <i class="fas fa-plus-circle"></i> Create New Event
         </a>
     </div>
 }
-
 else
 {
     <h1 class="text-center my-4">My Events</h1>
-
 
     <table class="table table-bordered table-striped">
         <thead class="thead-dark">
             <tr>
                 <th>Event Name</th>
                 <th>Start Date</th>
-                <th>Seats Available</th>
+                <th>Available Seats</th>
+                <th>Sponsored Ad</th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -41,9 +39,34 @@ else
                     <td>@eventItem.StartDateHumanized</td>
                     <td>@eventItem.Seats</td>
                     <td>
+                        @if (eventItem.IsSponsored && eventItem.SponsoredAd != null)
+                        {
+                            <span class="badge badge-success">Yes</span>
+                        }
+                        else
+                        {
+                            <span class="badge badge-secondary">No</span>
+                        }
+                    </td>
+                    <td>
                         <a href="@Url.Action("Details", "Event", new { id = eventItem.Id })" class="btn btn-info btn-sm">
                             <i class="fas fa-eye"></i> View Details
                         </a>
+                        @if (!eventItem.IsSponsored)
+                        {
+                            <a href="@Url.Action("Create", "SponsoredAd", new { eventId = eventItem.Id })" class="btn btn-primary btn-sm ml-2">
+                                <i class="fas fa-bullhorn"></i> Create Sponsored Ad
+                            </a>
+                        }
+                        else
+                        {
+                            <a href="/EventReport/EventReport/@eventItem.Id" class="btn btn-info btn-sm">
+                                <i class="fas fa-file-alt"></i> Report
+                            </a>
+
+
+
+                        }
                         <a href="@Url.Action("Delete", "Event", new { id = eventItem.Id })" class="btn btn-danger btn-sm ml-2">
                             <i class="fas fa-trash-alt"></i> Delete
                         </a>
@@ -63,7 +86,7 @@ else
         @if (Model.CurrentPage < Model.TotalPages)
         {
             <a href="@Url.Action("MyEvents", new { page = Model.CurrentPage + 1 })" class="btn btn-secondary btn-sm">
-                <i class="fas fa-chevron-right"></i> Next
+                Next <i class="fas fa-chevron-right"></i>
             </a>
         }
     </div>

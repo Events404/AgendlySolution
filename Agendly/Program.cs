@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using Models;
 using Utility;
+using Stripe;
+using utility;
 
 namespace Agendly
 {
@@ -25,8 +27,7 @@ namespace Agendly
 
             //builder.Services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
             //    .AddEntityFrameworkStores<ApplicationDbContext>();
-            //builder.Services.AddControllersWithViews();
-
+           
             builder.Services.AddIdentity<ApplicationUser, IdentityRole>(
               Option => {
                   Option.Password.RequiredLength = 8;
@@ -36,11 +37,17 @@ namespace Agendly
 
            .AddEntityFrameworkStores<ApplicationDbContext>()
            .AddDefaultTokenProviders();
+            builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
             builder.Services.AddScoped<EventIRepository, EventRepository>();
             builder.Services.AddScoped<CategoryIRepository, CategoryRepository>();
             builder.Services.AddScoped<CommentIRepository, CommentRepository>();
             builder.Services.AddScoped<LikeDisLikeIRepository, LikeDisLikeRepository>();
+            builder.Services.AddScoped<SponsoredAdIRepository, SponsoredAdRepository>();
             builder.Services.AddScoped<NotificationIRepository, NotificationRepository>();
+           
+            builder.Services.AddSignalR();
+
+
 
             builder.Services.AddAuthorization(); // إضافة هذه الخدمة
 
@@ -51,6 +58,9 @@ namespace Agendly
             builder.Services.AddRazorPages();
 
             builder.Services.AddSingleton<IEmailSender, EmailSender>();
+            builder.Services.Configure<StripeSettings>(builder.Configuration.GetSection("Stripe"));
+            StripeConfiguration.ApiKey = builder.Configuration["Stripe:SecretKey"];
+            builder.Services.AddControllersWithViews();
 
             var app = builder.Build();
 
@@ -70,8 +80,14 @@ namespace Agendly
             app.UseStaticFiles();
 
             app.UseRouting();
-
             app.UseAuthorization();
+
+            app.UseEndpoints(endpoints =>{ endpoints.MapHub<ChatHub>("/ChatHub");});
+            app.MapControllerRoute(
+             name: "eventreport",
+              pattern: "EventReport/{action}/{eventId?}",
+               defaults: new { controller = "EventReport", action = "EventReport" });
+
 
             app.MapControllerRoute(
                 name: "default",

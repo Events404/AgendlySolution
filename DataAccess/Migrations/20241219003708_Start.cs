@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace DataAccess.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialMigration1 : Migration
+    public partial class Start : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -28,6 +28,21 @@ namespace DataAccess.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "notifications",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Message = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Date = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_notifications", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Roles",
                 schema: "Security",
                 columns: table => new
@@ -40,6 +55,27 @@ namespace DataAccess.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Roles", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "sponsoredAds",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Duration = table.Column<int>(type: "int", nullable: false),
+                    Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    IsPaid = table.Column<bool>(type: "bit", nullable: false),
+                    UserId = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    EventId = table.Column<int>(type: "int", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    PaymentIntentId = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_sponsoredAds", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -130,6 +166,7 @@ namespace DataAccess.Migrations
                     StartDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     EndDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Country = table.Column<string>(type: "nvarchar(16)", maxLength: 16, nullable: false),
+                    StartDateHumanized = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     City = table.Column<string>(type: "nvarchar(16)", maxLength: 16, nullable: false),
                     District = table.Column<string>(type: "nvarchar(16)", maxLength: 16, nullable: false),
                     Street = table.Column<string>(type: "nvarchar(16)", maxLength: 16, nullable: false),
@@ -137,7 +174,12 @@ namespace DataAccess.Migrations
                     UrlImg = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Location = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CategorieId = table.Column<int>(type: "int", nullable: false),
-                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Seats = table.Column<int>(type: "int", nullable: false),
+                    Available = table.Column<bool>(type: "bit", nullable: false),
+                    IsSponsored = table.Column<bool>(type: "bit", nullable: false),
+                    SponsoredAdId = table.Column<int>(type: "int", nullable: true),
+                    ViewCount = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -153,6 +195,11 @@ namespace DataAccess.Migrations
                         column: x => x.UserId,
                         principalSchema: "Security",
                         principalTable: "Users",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Events_sponsoredAds_SponsoredAdId",
+                        column: x => x.SponsoredAdId,
+                        principalTable: "sponsoredAds",
                         principalColumn: "Id");
                 });
 
@@ -321,6 +368,34 @@ namespace DataAccess.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "LikeDislikes",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    EventId = table.Column<int>(type: "int", nullable: false),
+                    IsLike = table.Column<bool>(type: "bit", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_LikeDislikes", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_LikeDislikes_Events_EventId",
+                        column: x => x.EventId,
+                        principalTable: "Events",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_LikeDislikes_Users_UserId",
+                        column: x => x.UserId,
+                        principalSchema: "Security",
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "PromoCodes",
                 columns: table => new
                 {
@@ -395,8 +470,25 @@ namespace DataAccess.Migrations
                 column: "CategorieId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Events_SponsoredAdId",
+                table: "Events",
+                column: "SponsoredAdId",
+                unique: true,
+                filter: "[SponsoredAdId] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Events_UserId",
                 table: "Events",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_LikeDislikes_EventId",
+                table: "LikeDislikes",
+                column: "EventId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_LikeDislikes_UserId",
+                table: "LikeDislikes",
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
@@ -481,6 +573,12 @@ namespace DataAccess.Migrations
                 name: "Comments");
 
             migrationBuilder.DropTable(
+                name: "LikeDislikes");
+
+            migrationBuilder.DropTable(
+                name: "notifications");
+
+            migrationBuilder.DropTable(
                 name: "PromoCodes");
 
             migrationBuilder.DropTable(
@@ -521,6 +619,9 @@ namespace DataAccess.Migrations
 
             migrationBuilder.DropTable(
                 name: "Categorias");
+
+            migrationBuilder.DropTable(
+                name: "sponsoredAds");
 
             migrationBuilder.DropTable(
                 name: "Users",

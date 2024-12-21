@@ -1,0 +1,9 @@
+﻿@{
+    ViewData["Title"] = "Payment Cancelled";
+}
+
+<h2><i class="fas fa-times-circle text-danger"></i> Payment Cancelled</h2>
+<p>You have cancelled the payment process. If you'd like to try again, you can recreate the promoted ad.</p>
+<a asp-controller="Event" asp-action="Details" class="btn btn-primary" asp-route-id="@ViewBag.EventId">
+    <i class="fas fa-arrow-left"></i> Back to Event
+</a>

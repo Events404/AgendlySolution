@@ -9,8 +9,17 @@
   <ItemGroup>
     <PackageReference Include="Humanizer" Version="2.14.1" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="8.0.7" />
-  </ItemGroup>
+	  <PackageReference Include="Microsoft.AspNetCore.SignalR" Version="1.1.0" />
 
+  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="System.Collections" Version="4.3.0" />
+		<PackageReference Include="System.Diagnostics.Debug" Version="4.3.0" />
+		<PackageReference Include="System.IO.FileSystem.Primitives" Version="4.3.0" />
+		<PackageReference Include="System.Runtime.Extensions" Version="4.3.0" />
+		<PackageReference Include="System.Runtime.Handles" Version="4.3.0" />
+		<PackageReference Include="System.Runtime.InteropServices" Version="4.3.0" />
+	</ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Models\Models.csproj" />
   </ItemGroup>

@@ -362,6 +362,9 @@ namespace DataAccess.Migrations
                     b.Property<DateTime>("EndDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<bool>("IsSponsored")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Location")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -375,6 +378,9 @@ namespace DataAccess.Migrations
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("Seats")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("SponsoredAdId")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("StartDate")
@@ -396,9 +402,16 @@ namespace DataAccess.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<int>("ViewCount")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.HasIndex("CategorieId");
+
+                    b.HasIndex("SponsoredAdId")
+                        .IsUnique()
+                        .HasFilter("[SponsoredAdId] IS NOT NULL");
 
                     b.HasIndex("UserId");
 
@@ -526,6 +539,49 @@ namespace DataAccess.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Reports");
+                });
+
+            modelBuilder.Entity("Models.SponsoredAd", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Duration")
+                        .HasColumnType("int");
+
+                    b.Property<int>("EventId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsPaid")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("PaymentIntentId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("Price")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("sponsoredAds");
                 });
 
             modelBuilder.Entity("Models.WishList", b =>
@@ -659,6 +715,10 @@ namespace DataAccess.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("Models.SponsoredAd", "SponsoredAd")
+                        .WithOne("Event")
+                        .HasForeignKey("Models.Event", "SponsoredAdId");
+
                     b.HasOne("Models.ApplicationUser", "User")
                         .WithMany("Events")
                         .HasForeignKey("UserId")
@@ -666,6 +726,8 @@ namespace DataAccess.Migrations
                         .IsRequired();
 
                     b.Navigation("Categorie");
+
+                    b.Navigation("SponsoredAd");
 
                     b.Navigation("User");
                 });
@@ -731,7 +793,7 @@ namespace DataAccess.Migrations
                         .IsRequired();
 
                     b.HasOne("Models.WishList", "wishList")
-                        .WithMany()
+                        .WithMany("WishListEvents")
                         .HasForeignKey("WishListId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -762,6 +824,17 @@ namespace DataAccess.Migrations
                     b.Navigation("LikeDislikes");
 
                     b.Navigation("PromoCodes");
+                });
+
+            modelBuilder.Entity("Models.SponsoredAd", b =>
+                {
+                    b.Navigation("Event")
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Models.WishList", b =>
+                {
+                    b.Navigation("WishListEvents");
                 });
 #pragma warning restore 612, 618
         }

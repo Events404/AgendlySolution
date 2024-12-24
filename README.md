@@ -83,5 +83,7 @@ A comprehensive platform for managing events, designed to provide users with pow
 
 ![image](https://github.com/user-attachments/assets/b7fae3b4-ea59-4785-b3a0-e5478f1e9924)
 
+![image](https://github.com/user-attachments/assets/e70d4e7a-b71e-4b96-960b-828275f2237a)
+
 - **Email:** assemkhashaba02@gmail.com
 
